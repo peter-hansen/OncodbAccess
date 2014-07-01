@@ -4,7 +4,9 @@
 //
 //  Created by Hansen, Peter (NIH/NCI) [F] on 6/5/14.
 //  Copyright (c) 2014 National Cancer Institue. All rights reserved.
-//
+//  NOTE: AT THE TIME OF MY DEPARTURE THIS PAGE WAS NOT FUNCTIONAL, AND AS A RESULT
+//  I AM UNABLE TO ACTUALLY MAKE THIS PAGE. WHEN IT DOES WORK, CONTACT ME AT phansen@terpmail.umd.edu
+//  AND I'LL TRY TO IMPLEMENT IT.
 
 #import "RequestAccountViewController.h"
 

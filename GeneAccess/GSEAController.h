@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface GSEAController : UIViewController <NSURLConnectionDelegate, UIPickerViewDelegate, UIPickerViewDataSource>
+@interface GSEAController : UIViewController <NSURLConnectionDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIScrollViewDelegate>
+@property (strong, nonatomic) IBOutlet UIView *iPadView;
+@property (strong, nonatomic) IBOutlet UIView *container;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *descriptionHeightConstraint;
 @property (nonatomic) NSMutableString *html;
 @property (nonatomic) NSString *db;
 @end

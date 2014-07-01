@@ -108,6 +108,8 @@
     // The request is complete and data has been received
     
     response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
+    // if the server didn't tell us authentication failed and didn't tell us we're missing something, then the login was successful
+    // and we move onto the next page
     if([response rangeOfString:@"Not Authenticated"].location == NSNotFound && [response rangeOfString:@"Missing"].location == NSNotFound) {
         _passwordText.text = @"";
         UIStoryboard *storyboard = [[UIStoryboard alloc]init];
@@ -122,9 +124,6 @@
             storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
             ViewController = (DatabaseViewController *)[storyboard instantiateViewControllerWithIdentifier:@"databases"];
         }
- //       GSEAController *ViewController2 = [[GSEAController alloc] init];
- //       ViewController2 = (GSEAController *)[storyboard instantiateViewControllerWithIdentifier:@"GSEA"];
-  //      ViewController2.html = [response mutableCopy];
         ViewController.databaseHtml = [response mutableCopy];
         [self presentViewController:ViewController animated:YES completion:nil];
         [self.activityWheel stopAnimating];

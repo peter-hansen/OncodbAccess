@@ -41,6 +41,7 @@
 - (IBAction)closeModal:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+// Send the request to the server and let it handle things
 - (IBAction)submit:(id)sender {
     email = [_emailView text];
     FormPost *submitEmail = [[FormPost alloc] init];
