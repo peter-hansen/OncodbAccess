@@ -113,6 +113,8 @@
 // fields given, and shoot them off to the server. NOTE: BECAUSE THIS ISN'T WORKING
 // AT THE TIME OF MY DEPARTURE THIS PROGRAM DOES NOTHING WITH THE RESPONSE. WHEN THIS
 // IS WORKING, ADD WHAT TO DO WITH THE RESPONSE TO THE connectionDidFinishLoading METHOD
+// LOOK AT EXAMPLES IN DATABASEVIEWCONTROLLER.M I'M PRETTY SURE YOU CAN JUST COPY PASTE
+// ITS connectionDidFinishLoading METHOD HERE AND IT SHOULD WORK.
 - (IBAction)Search:(id)sender {
     [self.activityWheel startAnimating];
     // set URL to send request to
@@ -134,15 +136,22 @@
 {
     [super viewDidLoad];
     // These statements initialize all our pickerviews so that when we tap on
-    // a textfield they pop up instead of a keyboard.
+    // a textfield they pop up instead of a keyboard. These arrays define what
+    // shows up in the picker views
     _gtlts = [[NSArray alloc]initWithObjects:@">", @"<", nil];
     _optionsTissue = [[NSArray alloc]initWithObjects:@"", @"every_Stage", @"ASPS", @"Normal", nil];
     _andorArray = [[NSArray alloc]initWithObjects:@"AND", @"OR", nil];
+    // Allocate and itialize the memory to hold the picker
     _andorPicker = [[UIPickerView alloc]init];
+    // Tell it where to get data from
     [_andorPicker setDataSource:self];
+    // Tell it where to send data
     [_andorPicker setDelegate:self];
+    // Tell it to show what is selected
     [_andorPicker setShowsSelectionIndicator:YES];
+    // Set the input of the textfield to our pickerview
     _andor.inputView = _andorPicker;
+    // Repeat... etc
     _tissue0Picker = [[UIPickerView alloc]init];
     [_tissue0Picker setDataSource:self];
     [_tissue0Picker setDelegate:self];
@@ -299,6 +308,7 @@
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row
       inComponent:(NSInteger)component {
     if (pickerView == self.tissue0Picker) {
+        // Note that it is the title that is being used to set the textfield here, not the label
         [_tissue0 setText:[self pickerView:_tissue0Picker titleForRow:[_tissue0Picker selectedRowInComponent:0] forComponent:0]];
     }
     else if (pickerView == self.tissue1Picker) {
@@ -379,6 +389,9 @@
 }
 // This defines the number of selectable items in the pickerview. Right now
 // it is set to however many items we have to choose from
+// Usually it would be better to do for each picker view if(pickerView == self.____) return [____array count];
+// to make it dynamic, but in this case these values are always the same, so we don't need to go through
+// all of that.
 - (NSInteger)pickerView:(UIPickerView *)pickerView
 numberOfRowsInComponent:(NSInteger)component
 {
@@ -389,7 +402,9 @@ numberOfRowsInComponent:(NSInteger)component
         return 4;
     }
 }
-// This method defines the title of the row. In general, this is used very rarely.
+// This method defines the title of the row. This is what is behind the scenes. It is what the pickerview is
+// actually selecting, the viewForRow method defines what the user sees. Think about it like you have
+// <option value="foo">bar</option> foo is the title, bar is the view.
 - (NSString *)pickerView:(UIPickerView *)pickerView
              titleForRow:(NSInteger)row
             forComponent:(NSInteger)component

@@ -71,6 +71,12 @@
 @property (strong, nonatomic) NSMutableArray *Sarcoma;
 // cMAP
 @property (strong, nonatomic) NSMutableArray *cMAP;
+// How far the page needs to be able to scroll
+@property (nonatomic) int scrollDist;
+// Are the active objects pos/neg?
+@property (nonatomic) BOOL posNeg;
+// This label shows what datasets are currently displayed
+@property (strong, nonatomic) IBOutlet UILabel *currentSet;
 @end
 
 @implementation GSEAController
@@ -105,6 +111,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"cMAP";
+    [self howFar];
 }
 - (IBAction)Sarcoma:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -115,6 +124,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Sarcoma";
+    [self howFar];
 }
 - (IBAction)Rhabdomyosarcoma:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -125,6 +137,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Rhabdomyosarcoma";
+    [self howFar];
 }
 - (IBAction)Pediatric_Cancer:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -135,6 +150,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Pediatric_Cancer";
+    [self howFar];
 }
 - (IBAction)Normal_Tissue:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -145,6 +163,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Normal_Tissue";
+    [self howFar];
 }
 - (IBAction)Neuroblastoma:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -155,6 +176,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Neuroblastoma";
+    [self howFar];
 }
 - (IBAction)Medulloblastoma:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -165,6 +189,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Medulloblastoma";
+    [self howFar];
 }
 - (IBAction)Leukemia:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -175,6 +202,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    [self howFar];
+    _currentSet.text = @"Leukemia";
 }
 - (IBAction)Germ_Cell_Tumors:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -185,6 +215,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Germ_Cell_Tumors";
+    [self howFar];
 }
 - (IBAction)Drug_Response:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -195,6 +228,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Drug_Response";
+    [self howFar];
 }
 - (IBAction)Cell_Line:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -205,6 +241,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"Cell_Line";
+    [self howFar];
 }
 - (IBAction)ANN:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -215,6 +254,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = true;
+    _currentSet.text = @"ANN";
+    [self howFar];
 }
 - (IBAction)SampleDrug:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -225,6 +267,9 @@
         button.hidden = false;
         [_activeObjects addObject:button];
     }
+    _posNeg = false;
+    _currentSet.text = @"Sample.Drug";
+    [self howFar];
 }
 - (IBAction)NCI:(id)sender {
     for (UIView *object in _activeObjects) {
@@ -234,6 +279,48 @@
     for (UIView *button in _NCI) {
         button.hidden = false;
         [_activeObjects addObject:button];
+    }
+    _posNeg = false;
+    _currentSet.text = @"NCI";
+    [self howFar];
+}
+// A method to figure out how far the screen should scroll
+- (void)howFar {
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // If _posNeg is true, the switches are pair together, one positive sample, one negative therefore each
+        // row has four elements and since 19 rows and 2 columns can fit on the screen, after 19*2*4 elements
+        // the page needs more space. Each row is 34 pixels so we need to add that and a little more just to
+        // make it look nice
+        if (_posNeg) {
+            if ([_activeObjects count] > 152) {
+                int extra = [_activeObjects count]-160;
+                _scrollDist = 15 + 34*extra/4;
+            } else {
+                _scrollDist = 0;
+            }
+        } else {
+            // If _posNeg is false then we only need 19*2*2 elements, which is what we have here.
+            if ([_activeObjects count] > 76) {
+                int extra = [_activeObjects count]-80;
+                _scrollDist = 15 + 34*extra/2;
+            }
+        }
+    } else {
+        // the iPhone screen is far more limited than the iPad screen so it can only fit 1 column of 4 rows on
+        // the screen (1*4*4)
+        if (_posNeg) {
+            if ([_activeObjects count] > 16) {
+                int extra = [_activeObjects count]-20;
+                _scrollDist = 15 + 34*extra/4;
+            } else {
+                _scrollDist = 0;
+            }
+        } else {
+            if ([_activeObjects count] > 8) {
+                int extra = [_activeObjects count]-10;
+                _scrollDist = 15 + 34*extra/2;
+            }
+        }
     }
 }
 // A method that sends the user defined information to
@@ -301,6 +388,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    // It doesn't matter what posNeg starts as, it just has to have some value
+    _posNeg = false;
+    // We need to initialize how far we're letting the screen scroll. This statement
+    // should be equivalent to _scrollDist = 0;
+    [self howFar];
     _switches = [[NSMutableArray alloc]init];
     _realKeys = [[NSMutableDictionary alloc]init];
     _activeObjects = [[NSMutableArray alloc]init];
@@ -394,6 +486,26 @@
     NSString *checkUrl = [[NSString alloc]init];
     NSArray *dummyArray = [[NSArray alloc]init];
     NSArray *dummyArray2 = [[NSArray alloc]init];
+    // we need to figure out how many switches we're going to use for each catagory so we can devide them evenly between the
+    // two columns on the iPad. The way I decided to do that was to just count up all of the elements of msampleFinder_ that
+    // will eventually be turned into switches and labels. Note that int objects cannot be put into NSMutableArrays because
+    // arrays can only hold pointers, and int is a native object without a pointer, so I recast it as an NSNumber.
+    NSMutableArray *countsArray = [[NSMutableArray alloc]init];
+    NSInteger numberOfSwitchesNeeded = 0;
+    for (NSString *str in msampleFinder2) {
+        if ([[str substringWithRange:NSRangeFromString(@"0,5")] isEqualToString:@"/WWW/"]) {
+            numberOfSwitchesNeeded++;
+        } else {
+            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            [countsArray addObject:wrappedInt];
+            numberOfSwitchesNeeded = 0;
+        }
+        if ([str isEqual:[msampleFinder2 lastObject]]) {
+            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            [countsArray addObject:wrappedInt];
+            numberOfSwitchesNeeded = 0;
+        }
+    }
     // count is our overall number of switches + 1. The +1 is so that when necessary the next element in the array can be accessed
     // before it is iterated on
     int count = 1;
@@ -413,13 +525,9 @@
             // Since the iPad is so much bigger, we're obviously going to put the switches in different positions, so right here
             // before we do that we check to see if the device is an iPad or not
             if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-                // Since the iPad is big enough to fit everything on one page we are going to put all of these switches in two columns.
-                // This if statement defines when the new column starts. In this case there will be a new column made after 16 rows.
-                // The maximum ammount that will fit onto one page is around 2 columns and 18 rows per column. THEREFORE, IF YOU HAVE MORE
-                // THAN THAT NUMBER OF SAMPLES (positive and negative samples count as one in this case) EITHER CONTACT ME AT MY EMAIL ADDRESS
-                // phansen@terpmail.umd.edu OR ADAPT WHAT HAS BEEN DONE WITH UISCROLLVIEW ON THE IPHONE SIDE. OTHERWISE THIS ENTIRE THING
-                // COULD GET VERY MESSY.
-                if (c > 15) {
+                // Since the iPad is big enough to fit two columns, we are going to use two columns! To figure out when we need to start
+                // our new column we check to see if the number of rows in that column (c) exceeds half the number of switches in total.
+                if (c > [countsArray[s] floatValue]/2.0 - 0.5) {
                     row = 1;
                     c= 0;
                 }
@@ -436,8 +544,8 @@
                 [mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
                 // give the switch a label corresponding to it's id
                 mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%i", count];
-                [self.iPadView addSubview:mySwitch];
-                [self.iPadView addSubview:myLabel];
+                [self.container addSubview:mySwitch];
+                [self.container addSubview:myLabel];
                 // Add the new switche and label to their catagory so that the buttons can turn them on and off
                 [sampleSets[s] addObject:mySwitch];
                 [sampleSets[s] addObject:myLabel];
@@ -470,10 +578,26 @@
             row = 0;
         }
     }
+    // rest the values for the next set of switches
     BOOL left = true;
     c = 0;
     s++;
     row = 0;
+    numberOfSwitchesNeeded = 0;
+    for (NSString *str in msampleFinder4) {
+        if ([[str substringWithRange:NSRangeFromString(@"0,5")] isEqualToString:@"/WWW/"]) {
+            numberOfSwitchesNeeded++;
+        } else {
+            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            [countsArray addObject:wrappedInt];
+            numberOfSwitchesNeeded = 0;
+        }
+        if ([str isEqual:[msampleFinder4 lastObject]]) {
+            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            [countsArray addObject:wrappedInt];
+            numberOfSwitchesNeeded = 0;
+        }
+    }
     // exact same thing as above, just for sample sets that have positive and negative samples so
     // I added the BOOL left parameter, which just says whether each switch goes on the left or right
     // of the column.
@@ -484,7 +608,9 @@
                 checkUrl = dummyArray[0];
                 [_realKeys setObject:checkUrl forKey:[NSString stringWithFormat:@"%i", count]];
                 if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-                    if (c > 15) {
+                    // This is a tad bit different because there are two switches per row, so we need to divide
+                    // by 4 instead of 2.
+                    if (c > [countsArray[s] floatValue]/4.0 - 0.5) {
                         row = 1;
                         c= 0;
                     }
@@ -496,8 +622,8 @@
                     myLabel.font = [UIFont systemFontOfSize:14];
                     [self.container addSubview:myLabel];
                     myLabel.hidden = true;
-                    [self.iPadView addSubview:mySwitch];
-                    [self.iPadView addSubview:myLabel];
+                    [self.container addSubview:mySwitch];
+                    [self.container addSubview:myLabel];
                     [sampleSets[s] addObject:mySwitch];
                     [sampleSets[s] addObject:myLabel];
                     mySwitch.hidden = true;
@@ -521,10 +647,6 @@
                 checkUrl = dummyArray[0];
                 dummyArray2 = [dummyArray[2] componentsSeparatedByString:@"<span title='"];
                 if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-                    if (c > 15) {
-                        row = 1;
-                        c= 0;
-                    }
                     UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(115+75+355*row, 362 +c*34, 280, 21)];
                     myLabel.text = [NSString stringWithFormat:@"-  %@", [dummyArray2[0] stringByReplacingOccurrencesOfString:@"</span>" withString:@""]];
                     myLabel.font = [UIFont systemFontOfSize:14];
@@ -533,8 +655,8 @@
                     UISwitch *mySwitch = [[UISwitch alloc] initWithFrame:CGRectMake(50+75+355*row, 357 + c*34, 0, 0)];
                     [mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
                     mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%i", count];
-                    [self.iPadView addSubview:mySwitch];
-                    [self.iPadView addSubview:myLabel];
+                    [self.container addSubview:mySwitch];
+                    [self.container addSubview:myLabel];
                     [sampleSets[s] addObject:mySwitch];
                     [sampleSets[s] addObject:myLabel];
                     mySwitch.hidden = true;
@@ -565,14 +687,20 @@
     }
     // These methods define that the pickerviews should be used instead of a
     // keyboard for the text boxes.
+    // Allocate and initialize the memory for the pickerviews
     _samplePicker = [[UIPickerView alloc]init];
     _genePicker = [[UIPickerView alloc]init];
     _genesetPicker = [[UIPickerView alloc]init];
     _duplicatePicker = [[UIPickerView alloc]init];
+    // Tell pickerView where to get information from
     [_samplePicker setDataSource:self];
+    // Tell pickerview where to send data
     [_samplePicker setDelegate:self];
+    // Tell pickerview to show what's being selected
     [_samplePicker setShowsSelectionIndicator:YES];
+    // Tell picekrView to replace keyboard for textfield
     _sampleSelect.inputView = _samplePicker;
+    // tell textfield to show the first object in the pickerView by default
     _sampleSelect.text = _samples[0];
     [_genePicker setDataSource:self];
     [_genePicker setDelegate:self];
@@ -591,11 +719,16 @@
     _duplicateSelect.text = @"Keep highest value(abs)";
     [_scrollView setDelegate:self];
 }
-// ONLY FOR IPHONE: This sets the bottom of the dragable space in the iPhone. If any more samples are added than Neuroblastoma currently has,
-// this number will have to be increased, by about 35 per set.
+// This sets the bottom of the dragable space below the screen. If any more samples are added than twice what Neuroblastoma currently has,
+// the size of the webview will need to be increased. To do this go to the storyboard files and on each one locate the page that looks
+// like the GSEA page, it should have the title "Controller" below it, and you need to click on it. On the left side of the screen a nesting
+// display should show up with the top level being called "Controller Scene" open up the view nest and there should be a scroller view in it.
+// Open up the scroller view and there should be another view in that one. Select that view you now see and go to the right side of the screen
+// and open the size inspector (It looks like a ruler along the top row). Increase the height as much as necessary. Everything should work after
+// that.
 - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
-    if (targetContentOffset->y > 720) {
-        targetContentOffset->y = 720;
+    if (targetContentOffset->y > _scrollDist) {
+        targetContentOffset->y = _scrollDist;
     }
 }
 - (void)didReceiveMemoryWarning

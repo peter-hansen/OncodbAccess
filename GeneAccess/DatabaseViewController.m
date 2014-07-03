@@ -97,14 +97,21 @@
         _databaseIDs[temp] = key;
     }
     // initialize all the pickerviews
+    // The arrays hold the values that will show up in the pickerviews
     _heatmapThreshold.text=@"2";
     _values = @[@"Annotation", @"Transcript", @"GO ID", @"GO Term"];
     _chroms = @[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10", @"11", @"12", @"13", @"14", @"15", @"16", @"17", @"18", @"19", @"20", @"21", @"22", @"X", @"Y"];
+    // Allocate and initialize the memory for the pickerView
     _databasePicker = [[UIPickerView alloc]init];
+    // Tell the pickerView where to get it's data
     [_databasePicker setDataSource:self];
+    // Tell the pickerView where to send data
     [_databasePicker setDelegate:self];
+    // Tell the pickerView to show which row is selected
     [_databasePicker setShowsSelectionIndicator:YES];
+    // Set the pickerView as the thing that will pop up when you click on the textfield
     databaseSelect.inputView = _databasePicker;
+    // Set the textfield to automatically show the first database
     databaseSelect.text = _databases[0];
     _valuePicker = [[UIPickerView alloc]init];
     [_valuePicker setDataSource:self];
@@ -144,6 +151,9 @@
     if ([db rangeOfString:@"RNAseq"].location == NSNotFound) {
         _GSEA.hidden = true;
     }
+    NSString *message = @"Login Successful";
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    [alert show];
 }
 
 - (void)didReceiveMemoryWarning
@@ -401,6 +411,8 @@ numberOfRowsInComponent:(NSInteger)component
 }
 // For a given row this defines what the row should display as text.
 - (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view{
+    // using a UILabel allows us to set the size and font of what shows up in the picker wheel
+    // The function expects a UIView in return, so really any subclass of UIView will work. It doesn't have to be UILabel.
     UILabel* tView = (UILabel*)view;
     if (!tView){
         tView = [[UILabel alloc] init];
@@ -462,6 +474,15 @@ numberOfRowsInComponent:(NSInteger)component
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
     }
     if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
+        // All successful searches provide transcripts, so if this string is not there
+        // we know that it was unsuccessful and stop the program here.
+        if([_response rangeOfString:@"Transcripts(+)"].location == NSNotFound) {
+            NSString *message = @"There were no results for the given search parameters. (Tip:If you don't find your gene of interest in the Full-Text query add two wildcards (%), e.g. \"%CD45%\") ";
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Emtpy Response" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            [self.activityWheel stopAnimating];
+            return;
+        }
         // if there's a heatmapouter, we know that the data is ready to be viewed, so we switch to the view that will hold the data
         DataViewController *ViewController = (DataViewController *)[storyboard instantiateViewControllerWithIdentifier:@"data"];
         ViewController.html = [_response mutableCopy];

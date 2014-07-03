@@ -35,13 +35,16 @@
 {
     [sender resignFirstResponder];
 }
+// When someone presses return, we obviously assume that they mean to login.
+// So that's what this method does.
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [self.activityWheel startAnimating];
+    // close the keyboard, you won't need it anymore
     [textField resignFirstResponder];
-    // Create the request.
     username = [_usernameText text];
     password = [_passwordText text];
+    // Create the request.
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock"]];
     request.HTTPMethod = @"POST";
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
@@ -106,16 +109,12 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     // The request is complete and data has been received
-    
     response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
     // if the server didn't tell us authentication failed and didn't tell us we're missing something, then the login was successful
     // and we move onto the next page
     if([response rangeOfString:@"Not Authenticated"].location == NSNotFound && [response rangeOfString:@"Missing"].location == NSNotFound) {
         _passwordText.text = @"";
         UIStoryboard *storyboard = [[UIStoryboard alloc]init];
-        NSString *message = @"Login Successful";
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success!" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-        [alert show];
         DatabaseViewController *ViewController = [[DatabaseViewController alloc]init];
         if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
             storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
@@ -124,6 +123,7 @@
             storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
             ViewController = (DatabaseViewController *)[storyboard instantiateViewControllerWithIdentifier:@"databases"];
         }
+        // send the server response to DatabaseViewController
         ViewController.databaseHtml = [response mutableCopy];
         [self presentViewController:ViewController animated:YES completion:nil];
         [self.activityWheel stopAnimating];

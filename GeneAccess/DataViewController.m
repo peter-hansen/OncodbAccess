@@ -29,6 +29,7 @@
 @end
 
 @implementation DataViewController
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -92,6 +93,34 @@
         [_forwardHistory removeObjectAtIndex:[_forwardHistory count] -1];
     }
 }
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    CGFloat ratioAspect = _webView.bounds.size.width/_webView.bounds.size.height;
+    switch (toInterfaceOrientation) {
+        case UIInterfaceOrientationPortraitUpsideDown:
+        case UIInterfaceOrientationPortrait:
+            // Going to Portrait mode
+            for (UIScrollView *scroll in [_webView subviews]) { //we get the scrollview
+                // Make sure it really is a scroll view and reset the zoom scale.
+                if ([scroll respondsToSelector:@selector(setZoomScale:)]){
+                    scroll.minimumZoomScale = scroll.minimumZoomScale/ratioAspect;
+                    scroll.maximumZoomScale = scroll.maximumZoomScale/ratioAspect;
+                    [scroll setZoomScale:(scroll.zoomScale/ratioAspect) animated:YES];
+                }
+            }
+            break;
+        default:
+            // Going to Landscape mode
+            for (UIScrollView *scroll in [_webView subviews]) { //we get the scrollview
+                // Make sure it really is a scroll view and reset the zoom scale.
+                if ([scroll respondsToSelector:@selector(setZoomScale:)]){
+                    scroll.minimumZoomScale = scroll.minimumZoomScale *ratioAspect;
+                    scroll.maximumZoomScale = scroll.maximumZoomScale *ratioAspect;
+                    [scroll setZoomScale:(scroll.zoomScale*ratioAspect) animated:YES];
+                }
+            }
+            break;
+    }
+}
 - (void)deviceOrientationDidChange:(NSNotification *)notification {
     //Obtain current device orientation
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
@@ -102,7 +131,7 @@
         _webView.layer.frame = CGRectMake(0, 45, [UIScreen mainScreen].bounds.size.height, [UIScreen mainScreen].bounds.size.width-45);
     }
     if(UIDeviceOrientationIsPortrait(orientation)) {
-        _webView.layer.frame = CGRectMake(0, 45, [UIScreen mainScreen].bounds.size.height - 45, [UIScreen mainScreen].bounds.size.width);
+        _webView.layer.frame = CGRectMake(0, 45, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 45);
     }
 }
 - (void)viewDidLoad
@@ -122,15 +151,6 @@
     [_webView setBackgroundColor:[UIColor clearColor]];
     //Get just the data we want from the table
     NSArray* splittedArray= [_html componentsSeparatedByString:@"<div class=heatmap>"];
-    // All successful searches provide transcripts, so if this string is not there
-    // we know that it was unsuccessful and stop the program here.
-    if([_html rangeOfString:@"Transcripts(+)"].location == NSNotFound) {
-        NSString *message = @"There were no results for the given search parameters. (Tip:If you don't find your gene of interest in the Full-Text query add two wildcards (%), e.g. \"%CD45%\") ";
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Emtpy Response" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
-        [alert show];
-        [self dismissViewControllerAnimated:YES completion:nil];
-        return;
-    }
     // check to make sure the data we're looking for is there so the app doesn't crash
     NSMutableString *secondhtml = [[NSMutableString alloc]init];
     if(splittedArray[1]){
@@ -182,12 +202,12 @@
     NSURL *url = request.URL;
     NSString *urlPath = [url absoluteString];
     // if the url isn't blank we will do what we can to make it better formatted for mobile
-    if(![urlPath  isEqual: @"about:blank"]) {
+    if(![urlPath  isEqual: @"about:blank"] && [urlPath rangeOfString:@"applewebdata"].location == NSNotFound) {
         NSString *transcriptHTML = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
         // If they leave the nci-oncomics site they could be going anywhere, so there's no point in trying to manipulate things so the following
         // is onle done if they aren't
         if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://nci-oncomics-1.nci.nih.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<div class=heatmap>")].location != NSNotFound){
-            // This part is exactly what we did when we first loaded this view. Check the viewDidLoad documentation for more information.
+            // This part is exactly what we did when we first loaded this view and we're just doing it again because the user loaded another page on the website that requires the same manipulation. Check the viewDidLoad documentation for more information.
             NSArray* splittedArray= [transcriptHTML componentsSeparatedByString:@"<div class=heatmap>"];
             NSMutableString *secondhtml = [[NSMutableString alloc]init];
             if(splittedArray[1]){
@@ -225,6 +245,34 @@
                 _currentHTML = fourthhtml;
                 [webView loadHTMLString:[fourthhtml description] baseURL:nil];
                 return YES;
+            }
+            _backHTML = _currentHTML;
+            _backLocation++;
+            [_backHistory addObject:_currentHTML];
+            _currentHTML = thirdhtml;
+            [webView loadHTMLString:[thirdhtml description] baseURL:nil];
+            return YES;
+        }
+        else if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://nci-oncomics-1.nci.nih.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<table class=\"detailpage\">")].location != NSNotFound) {
+            NSArray* splittedArray= [transcriptHTML componentsSeparatedByString:@"<table class=\"detailpage\">"];
+            NSMutableString *secondhtml = [[NSMutableString alloc]init];
+            if(splittedArray[1]){
+                secondhtml = splittedArray[1];
+            } else {
+                return NO;
+            }
+            splittedArray= [secondhtml componentsSeparatedByString:@"<!-- footer wrapper -->"];
+            secondhtml = splittedArray[0];
+            NSMutableString *tableClass = [@"<div><table class=detailpage>" mutableCopy];
+            [tableClass appendString:secondhtml];
+            secondhtml = tableClass;
+            NSMutableString *thirdhtml = [[NSMutableString alloc]init];
+            thirdhtml = secondhtml;
+            if([secondhtml rangeOfString:@"<img src=\""].location != NSNotFound) {
+                splittedArray= [secondhtml componentsSeparatedByString:@"<img src=\""];
+                thirdhtml = [splittedArray[0] mutableCopy];
+                [thirdhtml appendString:@"<img src=\"http://nci-oncomics-1.nci.nih.gov/cgi-bin/"];
+                [thirdhtml appendString:splittedArray[1]];
             }
             _backHTML = _currentHTML;
             _backLocation++;
