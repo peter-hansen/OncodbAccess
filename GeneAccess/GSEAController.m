@@ -80,9 +80,8 @@
 @end
 
 @implementation GSEAController
-// A method that catches all touches made onto the MAIN view
-// Other views placed on top, such as UIScrollViews may
-// intercept these touches
+// A method that catches all touches made. I am currently using it to close the keyboard
+// if you touch on something that doesn't need it.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     // If the touch isn't on a UITextField, close the keyboard,
@@ -91,13 +90,6 @@
         [self.view endEditing:YES];
     }
     [super touchesBegan:touches withEvent:event];
-}
-// A method that in conjunction with its tracker defined in
-// viewDidLoad catches touches otherwise intercepted by the
-// UIScrollView and closes the keyboard
--(void) hideKeyBoard:(id) sender
-{
-    [self.scrollView endEditing:YES];
 }
 // The following methods map to the button of the same name
 // Each one hides all objects that are currently being used
@@ -396,9 +388,6 @@
     _switches = [[NSMutableArray alloc]init];
     _realKeys = [[NSMutableDictionary alloc]init];
     _activeObjects = [[NSMutableArray alloc]init];
-    // Add a tap reciever to the scroll view so that they won't be intercepted anymore. This works on conjunction with hideKeyBoard
-    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyBoard:)];
-    [_scrollView addGestureRecognizer:gestureRecognizer];
     _gene = @[@"Use all genes(probes)", @"Use current genes"];
     _duplicate = @[@"Keep highest value(abs)", @"keep all"];
     // The following set of code disects the <select> objects and extracts every option. The first one puts all the samples in _samples.
@@ -552,7 +541,7 @@
                 mySwitch.hidden = true;
             } else {
                 // exact same thing, just different positioning to accomodate the iPhone's screen
-                UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(54, 417 +c*34, 280, 21)];
+                UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(54, 412 +c*34, 280, 21)];
                 myLabel.text = [dummyArray2[0] stringByReplacingOccurrencesOfString:@"</span>" withString:@""];
                 myLabel.font = [UIFont systemFontOfSize:14];
                 [self.container addSubview:myLabel];

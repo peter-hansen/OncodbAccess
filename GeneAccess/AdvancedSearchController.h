@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AdvancedSearchController : UIViewController <NSURLConnectionDelegate, UIPickerViewDataSource, UIPickerViewDelegate>
+@interface AdvancedSearchController : UIViewController <NSURLConnectionDelegate, UIPickerViewDataSource, UIPickerViewDelegate, UITextFieldDelegate>
 // All these values are taken from the user defined parameters in DatabaseViewController
 @property (strong, nonatomic) NSString *db;
 @property (strong, nonatomic) NSString *produceHeatmap;

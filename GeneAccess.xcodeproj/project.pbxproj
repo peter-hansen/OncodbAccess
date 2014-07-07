@@ -14,6 +14,8 @@
 		B33438ED195A0747006F21FF /* GSEAController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33438EC195A0747006F21FF /* GSEAController.m */; };
 		B33DBD6719420C04008F5EBA /* DatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33DBD6619420C04008F5EBA /* DatabaseViewController.m */; };
 		B33DBD6A19424176008F5EBA /* DataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B33DBD6919424176008F5EBA /* DataViewController.m */; };
+		B35EECD2196AED6500465C36 /* UIScrollView+ScrollViewTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = B35EECD1196AED6500465C36 /* UIScrollView+ScrollViewTouch.m */; };
+		B35EECD5196B285D00465C36 /* dbInfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = B35EECD4196B285D00465C36 /* dbInfoController.m */; };
 		B37BCB0A193E03E6004EC6D0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B37BCB09193E03E6004EC6D0 /* Foundation.framework */; };
 		B37BCB0C193E03E6004EC6D0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B37BCB0B193E03E6004EC6D0 /* CoreGraphics.framework */; };
 		B37BCB0E193E03E6004EC6D0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B37BCB0D193E03E6004EC6D0 /* UIKit.framework */; };
@@ -56,6 +58,10 @@
 		B33DBD6619420C04008F5EBA /* DatabaseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseViewController.m; path = GeneAccess/DatabaseViewController.m; sourceTree = SOURCE_ROOT; };
 		B33DBD6819424176008F5EBA /* DataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DataViewController.h; path = GeneAccess/DataViewController.h; sourceTree = SOURCE_ROOT; };
 		B33DBD6919424176008F5EBA /* DataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DataViewController.m; path = GeneAccess/DataViewController.m; sourceTree = SOURCE_ROOT; };
+		B35EECD0196AED6500465C36 /* UIScrollView+ScrollViewTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+ScrollViewTouch.h"; sourceTree = "<group>"; };
+		B35EECD1196AED6500465C36 /* UIScrollView+ScrollViewTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+ScrollViewTouch.m"; sourceTree = "<group>"; };
+		B35EECD3196B285D00465C36 /* dbInfoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbInfoController.h; sourceTree = "<group>"; };
+		B35EECD4196B285D00465C36 /* dbInfoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dbInfoController.m; sourceTree = "<group>"; };
 		B37BCB06193E03E6004EC6D0 /* GeneAccess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeneAccess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B37BCB09193E03E6004EC6D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B37BCB0B193E03E6004EC6D0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -146,6 +152,8 @@
 				B37BCB19193E03E6004EC6D0 /* AppDelegate.m */,
 				B38DF1CC1958607E00BDAE81 /* Main_iPad.storyboard */,
 				B3234AA4195DCCE4004E017C /* Main_iPhone.storyboard */,
+				B35EECD3196B285D00465C36 /* dbInfoController.h */,
+				B35EECD4196B285D00465C36 /* dbInfoController.m */,
 				B33438EB195A0740006F21FF /* GSEAController.h */,
 				B33438EC195A0747006F21FF /* GSEAController.m */,
 				B33DBD6819424176008F5EBA /* DataViewController.h */,
@@ -158,6 +166,8 @@
 				B37BCB22193E03E6004EC6D0 /* ViewController.m */,
 				B33DBD6519420C04008F5EBA /* DatabaseViewController.h */,
 				B33DBD6619420C04008F5EBA /* DatabaseViewController.m */,
+				B35EECD0196AED6500465C36 /* UIScrollView+ScrollViewTouch.h */,
+				B35EECD1196AED6500465C36 /* UIScrollView+ScrollViewTouch.m */,
 				B37BCB24193E03E6004EC6D0 /* Images.xcassets */,
 				B37BCB10193E03E6004EC6D0 /* Supporting Files */,
 				B37BCB41193E1ECB004EC6D0 /* FormPost.h */,
@@ -306,10 +316,12 @@
 				B31E65AA1954889400D6CE92 /* AdvancedSearchController.m in Sources */,
 				B33438ED195A0747006F21FF /* GSEAController.m in Sources */,
 				B33DBD6A19424176008F5EBA /* DataViewController.m in Sources */,
+				B35EECD5196B285D00465C36 /* dbInfoController.m in Sources */,
 				B37BCB23193E03E6004EC6D0 /* ViewController.m in Sources */,
 				B37BCB1A193E03E6004EC6D0 /* AppDelegate.m in Sources */,
 				B33DBD6719420C04008F5EBA /* DatabaseViewController.m in Sources */,
 				B37BCB16193E03E6004EC6D0 /* main.m in Sources */,
+				B35EECD2196AED6500465C36 /* UIScrollView+ScrollViewTouch.m in Sources */,
 				B30CD3431940F2BA00D127BA /* ForgotPasswordViewController.m in Sources */,
 				B30CD3471941012900D127BA /* RequestAccountViewController.m in Sources */,
 				B37BCB43193E1ECB004EC6D0 /* FormPost.m in Sources */,

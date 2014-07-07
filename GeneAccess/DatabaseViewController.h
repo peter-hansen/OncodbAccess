@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DataViewController.h"
-@interface DatabaseViewController : UIViewController<NSURLConnectionDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
+@interface DatabaseViewController : UIViewController<NSURLConnectionDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate, UIScrollViewDelegate>
 {
     NSMutableData *_responseData;
 }

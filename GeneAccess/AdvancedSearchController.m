@@ -9,7 +9,7 @@
 //  WORK JUST FINE. IF IT DOESN'T JUST CONTACT ME AT phansen@terpmail.umd.edu
 
 #import "AdvancedSearchController.h"
-
+#import "DataViewController.h"
 @interface AdvancedSearchController ()
 // Unfortunately I couldn't think of a better way to do this, so each row has a variable
 // for the tissue select box, tissue select picker, gtlt, gtlt picker, and fold.
@@ -82,6 +82,7 @@
 @property (strong, nonatomic) NSMutableData *responseData;
 // Data in readable string format
 @property (strong, nonatomic) NSString *response;
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
 @end
 
 @implementation AdvancedSearchController
@@ -97,24 +98,34 @@
     }
     return self;
 }
-// A method that catches all touches made onto the MAIN view
-// Other views placed on top, such as UIScrollViews may
-// intercept these touches
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField;
+{
+    if (textField.frame.origin.y > 300) {
+        _scrollView.contentOffset = CGPointMake( 0, textField.frame.origin.y - 300); //required offset
+        //provide contentOffSet those who needed
+    } else {
+        _scrollView.contentOffset = CGPointMake(0, 0);
+    }
+    return YES;
+}
+// A method that catches all touches made. I am currently using it to close the keyboard
+// if you touch on something that doesn't need it.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     // If the touch isn't on a UITextField, close the keyboard,
     // we don't need it anymore
     if (![[touch view] isKindOfClass:[UITextField class]]) {
         [self.view endEditing:YES];
+        _scrollView.contentOffset = CGPointMake(0,0); //make UIScrollView as it was before
     }
     [super touchesBegan:touches withEvent:event];
 }
 // This is the main search function. It will take whatever search parameters are in the
-// fields given, and shoot them off to the server. NOTE: BECAUSE THIS ISN'T WORKING
-// AT THE TIME OF MY DEPARTURE THIS PROGRAM DOES NOTHING WITH THE RESPONSE. WHEN THIS
-// IS WORKING, ADD WHAT TO DO WITH THE RESPONSE TO THE connectionDidFinishLoading METHOD
-// LOOK AT EXAMPLES IN DATABASEVIEWCONTROLLER.M I'M PRETTY SURE YOU CAN JUST COPY PASTE
-// ITS connectionDidFinishLoading METHOD HERE AND IT SHOULD WORK.
+// fields given, and shoot them off to the server. NOTE: Because this isn't working at the
+// time of my departure, I had to make my best guess about what the response is going to
+// look like, and I wrote the script around that. It is, however, very likely that a few
+// characters will need to be changed in order to get it working well.
 - (IBAction)Search:(id)sender {
     [self.activityWheel startAnimating];
     // set URL to send request to
@@ -135,6 +146,42 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    // Set all delegates so that we can catch events on these objects. I specifically added these so that
+    // the textFieldShouldBeginEditing function can be triggered by textfields and the touchesBegan method
+    // can be triggered by the scrollView
+    [_tissue0 setDelegate:self];
+    [_tissue1 setDelegate:self];
+    [_tissue2 setDelegate:self];
+    [_tissue3 setDelegate:self];
+    [_tissue4 setDelegate:self];
+    [_tissue5 setDelegate:self];
+    [_tissue6 setDelegate:self];
+    [_tissue7 setDelegate:self];
+    [_tissue8 setDelegate:self];
+    [_tissue9 setDelegate:self];
+    [_tissue10 setDelegate:self];
+    [_gtlt0 setDelegate:self];
+    [_gtlt1 setDelegate:self];
+    [_gtlt2 setDelegate:self];
+    [_gtlt3 setDelegate:self];
+    [_gtlt4 setDelegate:self];
+    [_gtlt5 setDelegate:self];
+    [_gtlt6 setDelegate:self];
+    [_gtlt7 setDelegate:self];
+    [_gtlt8 setDelegate:self];
+    [_gtlt9 setDelegate:self];
+    [_gtlt10 setDelegate:self];
+    [_fold0 setDelegate:self];
+    [_fold1 setDelegate:self];
+    [_fold2 setDelegate:self];
+    [_fold3 setDelegate:self];
+    [_fold4 setDelegate:self];
+    [_fold5 setDelegate:self];
+    [_fold6 setDelegate:self];
+    [_fold7 setDelegate:self];
+    [_fold8 setDelegate:self];
+    [_fold9 setDelegate:self];
+    [_fold10 setDelegate:self];
     // These statements initialize all our pickerviews so that when we tap on
     // a textfield they pop up instead of a keyboard. These arrays define what
     // shows up in the picker views
@@ -452,14 +499,39 @@ numberOfRowsInComponent:(NSInteger)component
                   willCacheResponse:(NSCachedURLResponse*)cachedResponse {
     return nil;
 }
-
+// Use to handle the response you get from the server. Right now it's just an exact
+// copy of the method used to handle a normal text search.
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    // Use this method to handle the server's response and do whatever you want. Right now it does nothing.
     _response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
-    if([_response rangeOfString:@"Put what you're looking for in the html here"].location != NSNotFound) {
+    // find the appropriate storyboard for the given device
+    UIStoryboard *storyboard = [[UIStoryboard alloc]init];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
     } else {
+        storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
     }
-    [self.activityWheel stopAnimating];
+    if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
+        // All successful searches provide transcripts, so if this string is not there
+        // we know that it was unsuccessful and stop the program here.
+        if([_response rangeOfString:@"Transcripts(+)"].location == NSNotFound) {
+            NSString *message = @"There were no results for the given search parameters. (Tip:If you don't find your gene of interest in the Full-Text query add two wildcards (%), e.g. \"%CD45%\") ";
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Emtpy Response" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            [self.activityWheel stopAnimating];
+            return;
+        }
+        // if there's a heatmapouter, we know that the data is ready to be viewed, so we switch to the view that will hold the data
+        DataViewController *ViewController = (DataViewController *)[storyboard instantiateViewControllerWithIdentifier:@"data"];
+        ViewController.html = [_response mutableCopy];
+        [self presentViewController:ViewController animated:YES completion:nil];
+        [self.activityWheel stopAnimating];
+    }
+    else {
+        // if we didn't find any heatmapouter then the search was unsuccessful, so therefore we ask the user to provide different parameters
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Please enter valid search parameters" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        [self.activityWheel stopAnimating];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

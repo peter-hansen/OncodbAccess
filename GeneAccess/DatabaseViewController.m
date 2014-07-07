@@ -10,7 +10,13 @@
 #import "DataViewController.h"
 #import "GSEAController.h"
 #import "AdvancedSearchController.h"
+#import "dbInfoController.h"
 @interface DatabaseViewController ()
+// scrollView so that we can bring textfields that would normally
+// be hidden by the keyboard up into view
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+// Record any touches that might be needed among methods
+@property (strong, nonatomic) UITouch *touch;
 // Button that brings forward GSEA page
 @property (strong, nonatomic) IBOutlet UIButton *GSEA;
 // Textfield to input chromosome end for a position search
@@ -50,6 +56,13 @@
 {
     return NO;
 }
+// A method that in conjunction with its tracker defined in
+// viewDidLoad catches touches otherwise intercepted by the
+// UIScrollView and closes the keyboard
+//-(void) hideKeyBoard:(id) sender
+//{
+//    [self.scrollView endEditing:YES];
+//}
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -58,21 +71,69 @@
     }
     return self;
 }
-// A method that catches all touches made onto the MAIN view
-// Other views placed on top, such as UIScrollViews may
-// intercept these touches
+- (IBAction)dbInfo:(id)sender {
+    [self.activityWheel startAnimating];
+    // get the database ID and give it to ASC
+    NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
+    NSString *dbTag = @"";
+    dbTag = _databaseIDs[db];
+    // find the storyboard that coressponds to the the current device
+    UIStoryboard *storyboard = [[UIStoryboard alloc]init];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
+    } else {
+        storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+    }
+    // find the right view within the storyboard
+    dbInfoController *ViewController = (dbInfoController *)[storyboard instantiateViewControllerWithIdentifier:@"dbInfo"];
+    NSString *url = [NSString stringWithFormat:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock?rm=db_info;dbedit=YES;db=%@", dbTag];
+    NSURL *urlRequest = [NSURL URLWithString:url];
+    NSError *err = nil;
+    
+    NSString *html = [NSString stringWithContentsOfURL:urlRequest encoding:NSUTF8StringEncoding error:&err];
+
+    ViewController.html = [html mutableCopy];
+    // switch view to ASC
+    [self presentViewController:ViewController animated:YES completion:nil];
+    [self.activityWheel stopAnimating];
+}
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField;
+{
+    if (textField.frame.origin.y > 250) {
+        _scrollView.contentOffset = CGPointMake( 0, textField.frame.origin.y - 250); //required offset
+        //provide contentOffSet those who needed
+    } else {
+        _scrollView.contentOffset = CGPointMake(0, 0);
+    }
+    return YES;
+}
+// A method that catches all touches made. I am currently using it to close the keyboard
+// if you touch on something that doesn't need it.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     UITouch *touch = [[event allTouches] anyObject];
     // If the touch isn't on a UITextField, close the keyboard,
     // we don't need it anymore
     if (![[touch view] isKindOfClass:[UITextField class]]) {
         [self.view endEditing:YES];
+        _scrollView.contentOffset = CGPointMake(0,0); //make UIScrollView as it was before
     }
     [super touchesBegan:touches withEvent:event];
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    // Set all delegates so that we can catch events on these objects. I specifically added these so that
+    // the textFieldShouldBeginEditing function can be triggered by textfields and the touchesBegan method
+    // can be triggered by the scrollView
+    [_scrollView setDelegate:self];
+    [_heatmapThreshold setDelegate:self];
+    [heatmapValueSelect setDelegate:self];
+    [orderBySelect setDelegate:self];
+    [databaseSelect setDelegate:self];
+    [valueSelect setDelegate:self];
+    [chromSelect setDelegate:self];
+    [_chromStart setDelegate:self];
+    [_chromEnd setDelegate:self];
     // Here we're going to chop up the html response to find all the databases we have access to
     NSString *temp = [[NSMutableString alloc]init];
     NSArray* splittedArray= [_databaseHtml componentsSeparatedByString:@"<div id=db_help>"];
