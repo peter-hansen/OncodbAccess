@@ -345,7 +345,9 @@
     request.HTTPBody = requestBodyData;
     
     // Create url connection and fire request
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    // Here we cast it as void because we don't need to do anything
+    // with the return value
+    (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 // logout by closing view and requiring re-entering of username and password
 - (IBAction)logout:(id)sender {

@@ -80,6 +80,11 @@
 @end
 
 @implementation GSEAController
+// Turn off rotation of the device
+- (BOOL)shouldAutorotate
+{
+    return NO;
+}
 // A method that catches all touches made. I am currently using it to close the keyboard
 // if you touch on something that doesn't need it.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -353,7 +358,9 @@
     NSData *requestBodyData = [stringData dataUsingEncoding:NSUTF8StringEncoding];
     request.HTTPBody = requestBodyData;
     // Create url connection and fire request
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    // Here we cast it as void because we don't need to do anything
+    // with the return value
+    (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 // close the current view and return to the main page
 - (IBAction)back:(id)sender {

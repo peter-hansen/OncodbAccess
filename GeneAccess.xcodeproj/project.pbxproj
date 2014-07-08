@@ -29,7 +29,6 @@
 		B37BCB2E193E03E6004EC6D0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B37BCB0D193E03E6004EC6D0 /* UIKit.framework */; };
 		B37BCB36193E03E6004EC6D0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = B37BCB34193E03E6004EC6D0 /* InfoPlist.strings */; };
 		B37BCB38193E03E6004EC6D0 /* GeneAccessTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B37BCB37193E03E6004EC6D0 /* GeneAccessTests.m */; };
-		B37BCB43193E1ECB004EC6D0 /* FormPost.m in Sources */ = {isa = PBXBuildFile; fileRef = B37BCB42193E1ECB004EC6D0 /* FormPost.m */; };
 		B38DF1CD1958607E00BDAE81 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B38DF1CC1958607E00BDAE81 /* Main_iPad.storyboard */; };
 		B3ECECF7193E3340002BD8DC /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3ECECF6193E3340002BD8DC /* CoreData.framework */; };
 /* End PBXBuildFile section */
@@ -80,8 +79,6 @@
 		B37BCB33193E03E6004EC6D0 /* GeneAccessTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GeneAccessTests-Info.plist"; path = "GeneAccessTests/GeneAccessTests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		B37BCB35193E03E6004EC6D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B37BCB37193E03E6004EC6D0 /* GeneAccessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneAccessTests.m; path = GeneAccessTests/GeneAccessTests.m; sourceTree = SOURCE_ROOT; };
-		B37BCB41193E1ECB004EC6D0 /* FormPost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FormPost.h; path = GeneAccess/FormPost.h; sourceTree = SOURCE_ROOT; };
-		B37BCB42193E1ECB004EC6D0 /* FormPost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FormPost.m; path = GeneAccess/FormPost.m; sourceTree = SOURCE_ROOT; };
 		B38DF1CC1958607E00BDAE81 /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main_iPad.storyboard; path = GeneAccess/Main_iPad.storyboard; sourceTree = SOURCE_ROOT; };
 		B3ECECF6193E3340002BD8DC /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -170,8 +167,6 @@
 				B35EECD1196AED6500465C36 /* UIScrollView+ScrollViewTouch.m */,
 				B37BCB24193E03E6004EC6D0 /* Images.xcassets */,
 				B37BCB10193E03E6004EC6D0 /* Supporting Files */,
-				B37BCB41193E1ECB004EC6D0 /* FormPost.h */,
-				B37BCB42193E1ECB004EC6D0 /* FormPost.m */,
 			);
 			path = GeneAccess;
 			sourceTree = SOURCE_ROOT;
@@ -324,7 +319,6 @@
 				B35EECD2196AED6500465C36 /* UIScrollView+ScrollViewTouch.m in Sources */,
 				B30CD3431940F2BA00D127BA /* ForgotPasswordViewController.m in Sources */,
 				B30CD3471941012900D127BA /* RequestAccountViewController.m in Sources */,
-				B37BCB43193E1ECB004EC6D0 /* FormPost.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,7 +5,6 @@
 //  Created by Hansen, Peter (NIH/NCI) [F] on 6/3/14.
 //  Copyright (c) 2014 National Cancer Institue. All rights reserved.
 //
-#import "FormPost.h"
 #import "ViewController.h"
 #import "DatabaseViewController.h"
 #import "GseaController.h"
@@ -55,7 +54,9 @@
     request.HTTPBody = requestBodyData;
     
     // Create url connection and fire request
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    // Here we cast it as void because we don't need to do anything
+    // with the return value
+    (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
     return YES;
 }
 
@@ -84,7 +85,9 @@
     request.HTTPBody = requestBodyData;
     
     // Create url connection and fire request
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    // Here we cast it as void because we don't need to do anything
+    // with the return value
+    (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
 }
 
 #pragma mark NSURLConnection Delegate Methods
@@ -141,8 +144,8 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     // The request has failed for some reason!
-    NSString *message = @"ERROR";
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Wait" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+    NSString *message = @"There was an error connecting to the server. Please make sure you are logged into the VPN";
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
     [alert show];
 }
 

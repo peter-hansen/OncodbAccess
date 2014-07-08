@@ -7,9 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FormPost.h"
 @interface ForgotPasswordViewController : UIViewController
 @property (strong, nonatomic) IBOutlet UITextField *emailView;
-@property (strong, nonatomic) FormPost *submitEmail;
 @property (strong, nonatomic) NSString *email;
 @end

@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FormPost.h"
 #import "ViewController.h"
-@interface ViewController : UIViewController <UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource> {
+@interface ViewController : UIViewController <UITextFieldDelegate> {
     NSMutableData *_responseData;
 }
 //Login page

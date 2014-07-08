@@ -86,6 +86,11 @@
 @end
 
 @implementation AdvancedSearchController
+// Turn off rotation of the device
+- (BOOL)shouldAutorotate
+{
+    return NO;
+}
 // A method that brings us back to our main page by closing the current view
 - (IBAction)back:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -140,7 +145,9 @@
     request.HTTPBody = requestBodyData;
     
     // Create url connection and fire request
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    // Here we cast it as void because we don't need to do anything
+    // with the return value
+    (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
 
 }
 - (void)viewDidLoad
