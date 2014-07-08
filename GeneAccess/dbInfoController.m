@@ -14,6 +14,7 @@
 @end
 
 @implementation dbInfoController
+// Dismiss the view controller and go back to our original database page
 - (IBAction)back:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -26,6 +27,7 @@
     }
     return self;
 }
+// This method gets called every time the phone rotates and makes sure that the 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     CGFloat ratioAspect = _webView.bounds.size.width/_webView.bounds.size.height;
     switch (toInterfaceOrientation) {

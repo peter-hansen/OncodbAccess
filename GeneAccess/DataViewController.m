@@ -7,6 +7,7 @@
 //
 #import "DataViewController.h"
 #import "DatabaseViewController.h"
+#import "ViewController.h"
 #import <QuartzCore/QuartzCore.h>
 @interface DataViewController ()
 // I honestly do not remember what missingButton does. I spent
@@ -204,6 +205,25 @@
     // if the url isn't blank we will do what we can to make it better formatted for mobile
     if(![urlPath  isEqual: @"about:blank"] && [urlPath rangeOfString:@"applewebdata"].location == NSNotFound) {
         NSString *transcriptHTML = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:nil];
+        if ([transcriptHTML rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            return NO;
+        }
+        if ([transcriptHTML rangeOfString:@"login_submitted"].location != NSNotFound) {
+            // find the appropriate storyboard for the given device
+            UIStoryboard *storyboard = [[UIStoryboard alloc]init];
+            if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
+            } else {
+                storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+            }
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forced Logout" message:@"You have been inactive for too long and have been logged out. Please log in again."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+            [alert show];
+            ViewController *ViewController2 = (ViewController *)[storyboard instantiateViewControllerWithIdentifier:@"login"];
+            [self presentViewController:ViewController2 animated:YES completion:nil];
+            return NO;
+        }
         // If they leave the nci-oncomics site they could be going anywhere, so there's no point in trying to manipulate things so the following
         // is onle done if they aren't
         if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://nci-oncomics-1.nci.nih.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<div class=heatmap>")].location != NSNotFound){

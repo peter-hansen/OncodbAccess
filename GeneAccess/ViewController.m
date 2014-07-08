@@ -114,7 +114,7 @@
     // The request is complete and data has been received
     response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
     if ([response rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete                              your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
         return;
     }

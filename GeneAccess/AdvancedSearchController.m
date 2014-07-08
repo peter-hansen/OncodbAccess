@@ -10,6 +10,7 @@
 
 #import "AdvancedSearchController.h"
 #import "DataViewController.h"
+#import "ViewController.h"
 @interface AdvancedSearchController ()
 // Unfortunately I couldn't think of a better way to do this, so each row has a variable
 // for the tissue select box, tissue select picker, gtlt, gtlt picker, and fold.
@@ -510,12 +511,24 @@ numberOfRowsInComponent:(NSInteger)component
 // copy of the method used to handle a normal text search.
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     _response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
+    if ([_response rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete                              your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
     // find the appropriate storyboard for the given device
     UIStoryboard *storyboard = [[UIStoryboard alloc]init];
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
     } else {
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+    }
+    if ([_response rangeOfString:@"login_submitted"].location != NSNotFound) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forced Logout" message:@"You have been inactive for too long and have been logged out. Please log in again."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        ViewController *ViewController2 = (ViewController *)[storyboard instantiateViewControllerWithIdentifier:@"login"];
+        [self presentViewController:ViewController2 animated:YES completion:nil];
+        return;
     }
     if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
         // All successful searches provide transcripts, so if this string is not there

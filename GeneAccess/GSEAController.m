@@ -7,7 +7,7 @@
 //
 
 #import "GseaController.h"
-
+#import "ViewController.h"
 @interface GSEAController ()
 // Misc - These are objects that are used by all sample sets. All
 // objects without description are exactly what the name implies
@@ -849,6 +849,20 @@ numberOfRowsInComponent:(NSInteger)component
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     _response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
+    if ([_response rangeOfString:@"login_submitted"].location != NSNotFound) {
+        // find the appropriate storyboard for the given device
+        UIStoryboard *storyboard = [[UIStoryboard alloc]init];
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
+        } else {
+            storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+        }
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forced Logout" message:@"You have been inactive for too long and have been logged out. Please log in again."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        ViewController *ViewController2 = (ViewController *)[storyboard instantiateViewControllerWithIdentifier:@"login"];
+        [self presentViewController:ViewController2 animated:YES completion:nil];
+        return;
+    }
     // This method handles the response of the server. Here we check to see if the server
     // told us that it's running the program or not. We can change what we are looking for
     // by just changing what is in the rangeOfString: parameter

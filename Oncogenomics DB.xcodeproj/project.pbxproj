@@ -61,22 +61,22 @@
 		B35EECD1196AED6500465C36 /* UIScrollView+ScrollViewTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+ScrollViewTouch.m"; sourceTree = "<group>"; };
 		B35EECD3196B285D00465C36 /* dbInfoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbInfoController.h; sourceTree = "<group>"; };
 		B35EECD4196B285D00465C36 /* dbInfoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dbInfoController.m; sourceTree = "<group>"; };
-		B37BCB06193E03E6004EC6D0 /* GeneAccess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeneAccess.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B37BCB06193E03E6004EC6D0 /* Oncogenomics DB.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Oncogenomics DB.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B37BCB09193E03E6004EC6D0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		B37BCB0B193E03E6004EC6D0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		B37BCB0D193E03E6004EC6D0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		B37BCB11193E03E6004EC6D0 /* GeneAccess-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GeneAccess-Info.plist"; path = "GeneAccess/GeneAccess-Info.plist"; sourceTree = SOURCE_ROOT; };
+		B37BCB11193E03E6004EC6D0 /* Oncogenomics DB-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Oncogenomics DB-Info.plist"; sourceTree = "<group>"; };
 		B37BCB13193E03E6004EC6D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B37BCB15193E03E6004EC6D0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = GeneAccess/main.m; sourceTree = SOURCE_ROOT; };
-		B37BCB17193E03E6004EC6D0 /* GeneAccess-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "GeneAccess-Prefix.pch"; path = "GeneAccess/GeneAccess-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		B37BCB17193E03E6004EC6D0 /* Oncogenomics DB-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Oncogenomics DB-Prefix.pch"; sourceTree = "<group>"; };
 		B37BCB18193E03E6004EC6D0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = GeneAccess/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		B37BCB19193E03E6004EC6D0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = GeneAccess/AppDelegate.m; sourceTree = SOURCE_ROOT; };
 		B37BCB21193E03E6004EC6D0 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = GeneAccess/ViewController.h; sourceTree = SOURCE_ROOT; };
 		B37BCB22193E03E6004EC6D0 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = GeneAccess/ViewController.m; sourceTree = SOURCE_ROOT; };
 		B37BCB24193E03E6004EC6D0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = GeneAccess/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		B37BCB2A193E03E6004EC6D0 /* GeneAccessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeneAccessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B37BCB2A193E03E6004EC6D0 /* Oncogenomics DBTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Oncogenomics DBTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B37BCB2B193E03E6004EC6D0 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		B37BCB33193E03E6004EC6D0 /* GeneAccessTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GeneAccessTests-Info.plist"; path = "GeneAccessTests/GeneAccessTests-Info.plist"; sourceTree = SOURCE_ROOT; };
+		B37BCB33193E03E6004EC6D0 /* Oncogenomics DBTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Oncogenomics DBTests-Info.plist"; sourceTree = "<group>"; };
 		B37BCB35193E03E6004EC6D0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		B37BCB37193E03E6004EC6D0 /* GeneAccessTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneAccessTests.m; path = GeneAccessTests/GeneAccessTests.m; sourceTree = SOURCE_ROOT; };
 		B38DF1CC1958607E00BDAE81 /* Main_iPad.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main_iPad.storyboard; path = GeneAccess/Main_iPad.storyboard; sourceTree = SOURCE_ROOT; };
@@ -121,8 +121,8 @@
 		B37BCB07193E03E6004EC6D0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B37BCB06193E03E6004EC6D0 /* GeneAccess.app */,
-				B37BCB2A193E03E6004EC6D0 /* GeneAccessTests.xctest */,
+				B37BCB06193E03E6004EC6D0 /* Oncogenomics DB.app */,
+				B37BCB2A193E03E6004EC6D0 /* Oncogenomics DBTests.xctest */,
 			);
 			name = Products;
 			sourceTree = SOURCE_ROOT;
@@ -174,10 +174,10 @@
 		B37BCB10193E03E6004EC6D0 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				B37BCB11193E03E6004EC6D0 /* GeneAccess-Info.plist */,
+				B37BCB11193E03E6004EC6D0 /* Oncogenomics DB-Info.plist */,
 				B37BCB12193E03E6004EC6D0 /* InfoPlist.strings */,
 				B37BCB15193E03E6004EC6D0 /* main.m */,
-				B37BCB17193E03E6004EC6D0 /* GeneAccess-Prefix.pch */,
+				B37BCB17193E03E6004EC6D0 /* Oncogenomics DB-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			path = GeneAccess;
@@ -195,7 +195,7 @@
 		B37BCB32193E03E6004EC6D0 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				B37BCB33193E03E6004EC6D0 /* GeneAccessTests-Info.plist */,
+				B37BCB33193E03E6004EC6D0 /* Oncogenomics DBTests-Info.plist */,
 				B37BCB34193E03E6004EC6D0 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -213,9 +213,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B37BCB05193E03E6004EC6D0 /* GeneAccess */ = {
+		B37BCB05193E03E6004EC6D0 /* Oncogenomics DB */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B37BCB3B193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "GeneAccess" */;
+			buildConfigurationList = B37BCB3B193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "Oncogenomics DB" */;
 			buildPhases = (
 				B37BCB02193E03E6004EC6D0 /* Sources */,
 				B37BCB03193E03E6004EC6D0 /* Frameworks */,
@@ -225,14 +225,14 @@
 			);
 			dependencies = (
 			);
-			name = GeneAccess;
+			name = "Oncogenomics DB";
 			productName = GeneAccess;
-			productReference = B37BCB06193E03E6004EC6D0 /* GeneAccess.app */;
+			productReference = B37BCB06193E03E6004EC6D0 /* Oncogenomics DB.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B37BCB29193E03E6004EC6D0 /* GeneAccessTests */ = {
+		B37BCB29193E03E6004EC6D0 /* Oncogenomics DBTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B37BCB3E193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "GeneAccessTests" */;
+			buildConfigurationList = B37BCB3E193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "Oncogenomics DBTests" */;
 			buildPhases = (
 				B37BCB26193E03E6004EC6D0 /* Sources */,
 				B37BCB27193E03E6004EC6D0 /* Frameworks */,
@@ -243,9 +243,9 @@
 			dependencies = (
 				B37BCB30193E03E6004EC6D0 /* PBXTargetDependency */,
 			);
-			name = GeneAccessTests;
+			name = "Oncogenomics DBTests";
 			productName = GeneAccessTests;
-			productReference = B37BCB2A193E03E6004EC6D0 /* GeneAccessTests.xctest */;
+			productReference = B37BCB2A193E03E6004EC6D0 /* Oncogenomics DBTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -262,7 +262,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B37BCB01193E03E6004EC6D0 /* Build configuration list for PBXProject "GeneAccess" */;
+			buildConfigurationList = B37BCB01193E03E6004EC6D0 /* Build configuration list for PBXProject "Oncogenomics DB" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -275,8 +275,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B37BCB05193E03E6004EC6D0 /* GeneAccess */,
-				B37BCB29193E03E6004EC6D0 /* GeneAccessTests */,
+				B37BCB05193E03E6004EC6D0 /* Oncogenomics DB */,
+				B37BCB29193E03E6004EC6D0 /* Oncogenomics DBTests */,
 			);
 		};
 /* End PBXProject section */
@@ -335,7 +335,7 @@
 /* Begin PBXTargetDependency section */
 		B37BCB30193E03E6004EC6D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B37BCB05193E03E6004EC6D0 /* GeneAccess */;
+			target = B37BCB05193E03E6004EC6D0 /* Oncogenomics DB */;
 			targetProxy = B37BCB2F193E03E6004EC6D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -440,10 +440,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "GeneAccess/GeneAccess-Prefix.pch";
-				INFOPLIST_FILE = "GeneAccess/GeneAccess-Info.plist";
+				GCC_PREFIX_HEADER = "GeneAccess/Oncogenomics DB-Prefix.pch";
+				INFOPLIST_FILE = "GeneAccess/Oncogenomics DB-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Oncogenomics DB";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -455,10 +455,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "GeneAccess/GeneAccess-Prefix.pch";
-				INFOPLIST_FILE = "GeneAccess/GeneAccess-Info.plist";
+				GCC_PREFIX_HEADER = "GeneAccess/Oncogenomics DB-Prefix.pch";
+				INFOPLIST_FILE = "GeneAccess/Oncogenomics DB-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Oncogenomics DB";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
@@ -479,8 +479,8 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "GeneAccessTests/GeneAccessTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "GeneAccessTests/Oncogenomics DBTests-Info.plist";
+				PRODUCT_NAME = "Oncogenomics DBTests";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -497,8 +497,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GeneAccess/GeneAccess-Prefix.pch";
-				INFOPLIST_FILE = "GeneAccessTests/GeneAccessTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "GeneAccessTests/Oncogenomics DBTests-Info.plist";
+				PRODUCT_NAME = "Oncogenomics DBTests";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -507,7 +507,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B37BCB01193E03E6004EC6D0 /* Build configuration list for PBXProject "GeneAccess" */ = {
+		B37BCB01193E03E6004EC6D0 /* Build configuration list for PBXProject "Oncogenomics DB" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B37BCB39193E03E6004EC6D0 /* Debug */,
@@ -516,7 +516,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B37BCB3B193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "GeneAccess" */ = {
+		B37BCB3B193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "Oncogenomics DB" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B37BCB3C193E03E6004EC6D0 /* Debug */,
@@ -525,7 +525,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B37BCB3E193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "GeneAccessTests" */ = {
+		B37BCB3E193E03E6004EC6D0 /* Build configuration list for PBXNativeTarget "Oncogenomics DBTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B37BCB3F193E03E6004EC6D0 /* Debug */,

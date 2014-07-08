@@ -11,6 +11,7 @@
 #import "GSEAController.h"
 #import "AdvancedSearchController.h"
 #import "dbInfoController.h"
+#import "ViewController.h"
 @interface DatabaseViewController ()
 // scrollView so that we can bring textfields that would normally
 // be hidden by the keyboard up into view
@@ -148,7 +149,7 @@
     for (NSString *str in loopArray) {
         // We don't want any of the html to show up for the user, so right here it's being cut out
         splittedStr = [str componentsSeparatedByString:@">"];
-        temp = [splittedStr[4] substringToIndex:[splittedStr[4] length]-3];
+        temp = [splittedStr[6] substringToIndex:[splittedStr[6] length]-3];
         if([temp length] != 1) {
             [_databases addObject:(temp)];
         }
@@ -529,12 +530,24 @@ numberOfRowsInComponent:(NSInteger)component
 // Method that runs when the server responds
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     _response = [[NSString alloc] initWithData:_responseData encoding:NSASCIIStringEncoding];
+    if ([_response rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
     // find the appropriate storyboard for the given device
     UIStoryboard *storyboard = [[UIStoryboard alloc]init];
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
     } else {
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+    }
+    if ([_response rangeOfString:@"login_submitted"].location != NSNotFound) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forced Logout" message:@"You have been inactive for too long and have been logged out. Please log in again."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        ViewController *ViewController2 = (ViewController *)[storyboard instantiateViewControllerWithIdentifier:@"login"];
+        [self presentViewController:ViewController2 animated:YES completion:nil];
+        return;
     }
     if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
         // All successful searches provide transcripts, so if this string is not there
