@@ -352,7 +352,7 @@
         }
     }
     // Create a request object with all the data we want to send to the server. This is how variadic functions are defined in objective C
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=genomic", _db]]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@?rm=query_all;db=%@;source=genomic",globalURL, _db]]];
     request.HTTPMethod = @"POST";
     NSString *stringData = [NSString stringWithFormat:@"rm=query_all&frm=query_all&submitted_multi_expression_query=TRUErm=show_gsea&show_gsea=Run+GSEA&prerank_file=null&gsea_file=null&db=%@&smplid=%ld&geneset=%@&geneduprm=%@&gmx=%@%@", _db, (long)[self.samplePicker selectedRowInComponent:0], chosenGenes, duplicateyn, chosenGeneset, grp];
     NSData *requestBodyData = [stringData dataUsingEncoding:NSUTF8StringEncoding];

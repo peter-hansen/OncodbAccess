@@ -149,7 +149,7 @@
         c++;
     }
     // set URL to send request to
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:globalURL]];
     // set method to send HTTP request by
     request.HTTPMethod = @"POST";
     // set encoding

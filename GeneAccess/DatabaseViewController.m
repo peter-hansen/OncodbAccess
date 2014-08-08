@@ -159,7 +159,7 @@
         _databaseIDs[temp] = key;
     }
     NSError *error;
-    NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=cdna", _databaseIDs[_databases[0]]]] encoding:NSASCIIStringEncoding error:&error];
+    NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@?rm=query_all;db=%@;source=cdna",globalURL, _databaseIDs[_databases[0]]]] encoding:NSASCIIStringEncoding error:&error];
     // The following set of code disects the <select> objects and extracts every option. The first one puts all the samples in _samples.
     // This one takes all the genesets and puts them in _genesets
     NSArray *sampleFinder = [htmlPage componentsSeparatedByString:@"<select name=\"exprs\""];
@@ -370,7 +370,7 @@
 - (IBAction)search:(UIButton*)sender {
     [self.activityWheel startAnimating];
     // create a HTTP request
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:globalURL]];
     // define HTTP method
     request.HTTPMethod = @"POST";
     int chromNum = [chromSelect.text intValue];
@@ -509,7 +509,7 @@
 			_databaseIDs[temp] = key;
 		}
 		NSError *error;
-		NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=cdna", _databaseIDs[db]]] encoding:NSASCIIStringEncoding error:&error];
+		NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@?rm=query_all;db=%@;source=cdna", globalURL, _databaseIDs[db]]] encoding:NSASCIIStringEncoding error:&error];
 		// The following set of code disects the <select> objects and extracts every option. The first one puts all the samples in _samples.
 		// This one takes all the genesets and puts them in _genesets
 		NSArray *sampleFinder = [htmlPage componentsSeparatedByString:@"<select name=\"exprs\""];

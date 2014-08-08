@@ -35,4 +35,5 @@
 @property(strong, nonatomic) NSString *password;
 // string that holds value of server response
 @property(strong, nonatomic) NSString *response;
+extern NSString *globalURL;
 @end

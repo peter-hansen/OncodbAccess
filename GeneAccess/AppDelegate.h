@@ -10,5 +10,6 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
+@property (strong, nonatomic) NSString *globalURL;
 @property (strong, nonatomic) UIWindow *window;
 @end

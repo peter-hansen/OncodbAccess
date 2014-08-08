@@ -7,6 +7,7 @@
 //
 
 #import "ForgotPasswordViewController.h"
+#import "ViewController.h"
 @interface ForgotPasswordViewController ()
 @property (strong, nonatomic) IBOutlet UIActivityIndicatorView *activityWheel;
 
@@ -46,7 +47,7 @@
     [_activityWheel startAnimating];
     email = [_emailView text];
     // Create the request.
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:globalURL]];
     
     // Specify that it will be a POST request
     request.HTTPMethod = @"POST";
