@@ -752,6 +752,7 @@ numberOfRowsInComponent:(NSInteger)component
     if ([_response rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
+		[self.activityWheel stopAnimating];
         return;
     }
     // find the appropriate storyboard for the given device
