@@ -10,9 +10,12 @@
 #import "DataViewController.h"
 #import "GSEAController.h"
 #import "AdvancedSearchController.h"
-#import "dbInfoController.h"
 #import "ViewController.h"
 @interface DatabaseViewController ()
+// This is the object that holds the response each switch should
+// give if turned on
+@property (strong, nonatomic) NSMutableDictionary *realKeys;
+@property (strong, nonatomic) IBOutlet UIView *container;
 // scrollView so that we can bring textfields that would normally
 // be hidden by the keyboard up into view
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -26,24 +29,18 @@
 @property (strong, nonatomic) IBOutlet UITextField *chromStart;
 // Switch to turn on and off heatmaps
 @property (strong, nonatomic) IBOutlet UISwitch *heatmapSwitch;
-// Switch to turn on and off transcript
-@property (strong, nonatomic) IBOutlet UISwitch *transcriptSwitch;
-// Switch to turn on and off transcript locations
-@property (strong, nonatomic) IBOutlet UISwitch *transcriptLocationSwitch;
-// Switch to turn on and off Entrez Gene ID information
-@property (strong, nonatomic) IBOutlet UISwitch *entrezGeneIdSwitch;
-// Switch to turn on and off Gene Symbol information
-@property (strong, nonatomic) IBOutlet UISwitch *geneSymbolSwitch;
-// Switch to turn on and off Gene Title information
-@property (strong, nonatomic) IBOutlet UISwitch *geneTitleSwitch;
-// Switch to turn on and off Membrane Protein information
-@property (strong, nonatomic) IBOutlet UISwitch *membraneProteinSwitch;
-// Value for heatmap color threshold
+@property (strong, nonatomic) IBOutlet UILabel *heatmapThresholdLabel;
 @property (strong, nonatomic) IBOutlet UITextField *heatmapThreshold;
 // Databases available to user
 @property NSMutableArray *databases;
 // ID's of all databases
 @property NSMutableDictionary *databaseIDs;
+@property NSMutableDictionary *genesets;
+// How far the page needs to be able to scroll
+@property (nonatomic) NSUInteger scrollDist;
+@property (strong, nonatomic) NSMutableArray *activeObjects;
+// This holds all switches that will be tracked
+@property (strong, nonatomic) NSMutableArray *switches;
 @end
 
 @implementation DatabaseViewController
@@ -56,7 +53,35 @@
 - (BOOL)shouldAutorotate
 {
     return NO;
+}- (void)changeSwitch:(id)sender{
+    if([sender isOn]){
+        // start tracking switch
+        [_switches addObject:sender];
+    } else{
+        // do nothing
+    }
 }
+// A method to figure out how far the screen should scroll
+- (void)howFar {
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // If _posNeg is true, the switches are pair together, one positive sample, one negative therefore each
+        // row has four elements and since 19 rows and 2 columns can fit on the screen, after 19*2*4 elements
+        // the page needs more space. Each row is 34 pixels so we need to add that and a little more just to
+        // make it look nice
+        if ([_activeObjects count] > 76) {
+            NSUInteger extra = [_activeObjects count]-80;
+            _scrollDist = 15 + 34*extra/2;
+        }
+    } else {
+        // the iPhone screen is far more limited than the iPad screen so it can only fit 1 column of 4 rows on
+        // the screen (1*4*4)
+        if ([_activeObjects count] > 8) {
+            NSUInteger extra = [_activeObjects count]-10;
+            _scrollDist = 15 + 34*extra/2;
+        }
+    }
+}
+
 // A method that in conjunction with its tracker defined in
 // viewDidLoad catches touches otherwise intercepted by the
 // UIScrollView and closes the keyboard
@@ -71,32 +96,6 @@
         // Custom initialization
     }
     return self;
-}
-- (IBAction)dbInfo:(id)sender {
-    [self.activityWheel startAnimating];
-    // get the database ID and give it to ASC
-    NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
-    NSString *dbTag = @"";
-    dbTag = _databaseIDs[db];
-    // find the storyboard that coressponds to the the current device
-    UIStoryboard *storyboard = [[UIStoryboard alloc]init];
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
-    } else {
-        storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
-    }
-    // find the right view within the storyboard
-    dbInfoController *ViewController = (dbInfoController *)[storyboard instantiateViewControllerWithIdentifier:@"dbInfo"];
-    NSString *url = [NSString stringWithFormat:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock?rm=db_info;dbedit=YES;db=%@", dbTag];
-    NSURL *urlRequest = [NSURL URLWithString:url];
-    NSError *err = nil;
-    
-    NSString *html = [NSString stringWithContentsOfURL:urlRequest encoding:NSUTF8StringEncoding error:&err];
-
-    ViewController.html = [html mutableCopy];
-    // switch view to ASC
-    [self presentViewController:ViewController animated:YES completion:nil];
-    [self.activityWheel stopAnimating];
 }
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField;
 {
@@ -137,7 +136,7 @@
     [_chromEnd setDelegate:self];
     // Here we're going to chop up the html response to find all the databases we have access to
     NSString *temp = [[NSMutableString alloc]init];
-    NSArray* splittedArray= [_databaseHtml componentsSeparatedByString:@"<div id=db_help>"];
+    NSArray* splittedArray= [_databaseHtml componentsSeparatedByString:@"<td align=center><a href='"];
     NSMutableArray* loopArray = [splittedArray mutableCopy];
     [loopArray removeObjectAtIndex:0];
     NSArray* splittedStr = [[NSArray alloc]init];
@@ -149,14 +148,127 @@
     for (NSString *str in loopArray) {
         // We don't want any of the html to show up for the user, so right here it's being cut out
         splittedStr = [str componentsSeparatedByString:@">"];
-        temp = [splittedStr[6] substringToIndex:[splittedStr[6] length]-3];
+        temp = [splittedStr[1] substringToIndex:[splittedStr[1] length]-3];
+        
         if([temp length] != 1) {
             [_databases addObject:(temp)];
         }
         splittedStrv2 = [str componentsSeparatedByString:@"db="];
-        splittedStrv3 = [splittedStrv2[1] componentsSeparatedByString:@"\", \""];
+        splittedStrv3 = [splittedStrv2[1] componentsSeparatedByString:@";"];
         NSString *key = [splittedStrv3 objectAtIndex:0];
         _databaseIDs[temp] = key;
+    }
+    NSError *error;
+    NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=cdna", _databaseIDs[_databases[0]]]] encoding:NSASCIIStringEncoding error:&error];
+    // The following set of code disects the <select> objects and extracts every option. The first one puts all the samples in _samples.
+    // This one takes all the genesets and puts them in _genesets
+    NSArray *sampleFinder = [htmlPage componentsSeparatedByString:@"<select name=\"exprs\""];
+    NSArray *sampleFinder2 = [sampleFinder[1] componentsSeparatedByString:@"</select>"];
+    NSMutableArray *sampleFinder3 = [[sampleFinder2[0] componentsSeparatedByString:@"<option"] mutableCopy];
+    [sampleFinder3 removeObjectAtIndex:0];
+    _genesets = [[NSMutableDictionary alloc]init];
+	_heatmapValues = [[NSMutableArray alloc]init];
+    NSArray *sampleFinder4 = [[NSArray alloc]init];
+    NSString *key = [[NSString alloc]init];
+    NSString *url = [[NSString alloc]init];
+    // each geneset has both a display name and an address for where the file is, so each display name (the key)
+    // has to be mapped to the address (the url, or object)
+    for (NSString *object in sampleFinder3) {
+        sampleFinder4 = [object componentsSeparatedByString:@">"];
+        if([sampleFinder4 count] == 3) {
+            key = sampleFinder4[1];
+            key = [key stringByReplacingOccurrencesOfString:@"   " withString:@" "];
+            key = [key stringByReplacingOccurrencesOfString:@"</option" withString:@""];
+            sampleFinder4 = [sampleFinder4[0] componentsSeparatedByString:@"value=\""];
+			url = sampleFinder4[1];
+            url = [url stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+            url = [url stringByReplacingOccurrencesOfString:@"=" withString:@""];
+            [_genesets setObject:url forKey:key];
+			[_heatmapValues addObject:key];
+        }
+    }
+    _switches = [[NSMutableArray alloc]init];
+    _realKeys = [[NSMutableDictionary alloc]init];
+	_orderBy = [[NSMutableArray alloc]init];
+    // Getting all the preset checkboxes is a little more complicated, so here a lot of manipulation has to be done.
+    // This isn't going to make a lot of sense unless you go and look at the html that's being recieved from the server.
+    // when you see it, it will make sense why each of these manipulations are being done.
+    // componentsSeparatedByString is the exact same as javascript .split("foobar");
+    NSMutableArray *msampleFinder = [[htmlPage componentsSeparatedByString:@"<input type=\"checkbox\" name=\"annot\" value=\""] mutableCopy];
+    [msampleFinder removeObjectAtIndex:0];
+    // Put a break point here and just look at the contents of each msampleFinder and it'll make sense.
+    // The last object is just going to be a bunch of gunk html that gives us the rest of the page data, but we don't care about that
+    // because we only wanted the check boxes
+    // The following code generates the switches, the labels describing them, and the data each one will provide if turned on.
+    // These are counters, c is what row the next switch should be generated on, and s is the catagory the next switch should be placed under.
+    int c = 0;
+    NSArray *dummyArray = [[NSArray alloc]init];
+    // we need to figure out how many switches we're going to use for each catagory so we can devide them evenly between the
+    // two columns on the iPad. The way I decided to do that was to just count up all of the elements of msampleFinder_ that
+    // will eventually be turned into switches and labels. Note that int objects cannot be put into NSMutableArrays because
+    // arrays can only hold pointers, and int is a native object without a pointer, so I recast it as an NSNumber.
+    NSNumber *numberOfSwitchesNeeded = [[NSNumber alloc]initWithInt:[msampleFinder count]];
+	// Keep track of what objects we've created
+	_activeObjects = [[NSMutableArray alloc]init];
+    // count is our overall number of switches + 1. The +1 is so that when necessary the next element in the array can be accessed
+    // before it is iterated on
+    int count = 1;
+    // row should really be column, this will only ever be 0 (left) or 1 (right)
+    int row = 0;
+    // We start with the 0.___ samples that we earlier put in msampleFinder2
+    for (NSString *str in msampleFinder) {
+        dummyArray = [str componentsSeparatedByString:@"\""];        // We don't need the beginning of our array anymore because we already captured it, so we're going to throw it away
+        // Since the iPad is so much bigger, we're obviously going to put the switches in different positions, so right here
+        // before we do that we check to see if the device is an iPad or not
+        if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+            // Since the iPad is big enough to fit two columns, we are going to use two columns! To figure out when we need to start
+            // our new column we check to see if the number of rows in that column (c) exceeds half the number of switches in total.
+            if (c > [numberOfSwitchesNeeded floatValue]/2.0 - 0.5) {
+                row = 1;
+                c= 0;
+            }
+            // Making the label that goes next to the switch. The parameters are (xpos, ypos, width, height)
+            UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(54+50 +355*row, 635 +c*34, 280, 21)];
+            myLabel.text = dummyArray[0];
+            myLabel.font = [UIFont systemFontOfSize:22];
+            // Place the label in the view that is on top. Otherwise it will be invisible
+            [self.container addSubview:myLabel];
+            UISwitch *mySwitch = [[UISwitch alloc] initWithFrame:CGRectMake(50+355*row, 630 + c*34, 0, 0)];
+            [mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
+            // give the switch a label corresponding to it's id
+            mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%@", dummyArray[0]];
+			if ([str rangeOfString:@"checked"].location != NSNotFound) {
+				[mySwitch setOn:YES];
+			}
+			[_orderBy addObject:dummyArray[0]];
+            [self.container addSubview:mySwitch];
+            [self.container addSubview:myLabel];
+            [_activeObjects addObject:mySwitch];
+            [_activeObjects addObject:myLabel];
+        } else {
+            // exact same thing, just different positioning to accomodate the iPhone's screen
+            UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(71, 422+c*34, 280, 21)];
+            myLabel.text = dummyArray[0];
+            myLabel.font = [UIFont systemFontOfSize:14];
+            [self.container addSubview:myLabel];
+            UISwitch *mySwitch = [[UISwitch alloc] initWithFrame:CGRectMake(17, 422 + c*34, 0, 0)];
+            [mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
+            mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%@", dummyArray[0]];
+			if ([str rangeOfString:@"checked"].location != NSNotFound) {
+				[mySwitch setOn:YES];
+			}
+			[_orderBy addObject:dummyArray[0]];
+            [self.container addSubview:mySwitch];
+            [self.container addSubview:myLabel];
+            [_activeObjects addObject:mySwitch];
+            [_activeObjects addObject:myLabel];
+        }
+        c++;
+        count++;
+    }
+    [self howFar];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        
     }
     // initialize all the pickerviews
     // The arrays hold the values that will show up in the pickerviews
@@ -195,19 +307,17 @@
     limitSelect.inputView = _limitPicker;
     limitSelect.text = @"20";
     _heatmapValuePicker = [[UIPickerView alloc]init];
-    _heatmapValues = @[@"Z-Score on Normal Samples", @"Log2 Intensities", @"Median-Centered", @"Z-Score", @"Median-Centered on Normal Samples"];
     [_heatmapValuePicker setDataSource:self];
     [_heatmapValuePicker setDelegate:self];
     [_heatmapValuePicker setShowsSelectionIndicator:YES];
     heatmapValueSelect.inputView = _heatmapValuePicker;
-    heatmapValueSelect.text = @"Z-Score on Normal Samples";
+    heatmapValueSelect.text = _heatmapValues[0];
     _orderByPicker = [[UIPickerView alloc]init];
-    _orderBy = @[@"Gene Symbol", @"Transcript", @"Transcript Location", @"Entrez Gene ID",  @"Gene Title", @"Membrane Protein"];
     [_orderByPicker setDataSource:self];
     [_orderByPicker setDelegate:self];
     [_orderByPicker setShowsSelectionIndicator:YES];
     orderBySelect.inputView = _orderByPicker;
-    orderBySelect.text = @"Gene Symbol";
+    orderBySelect.text = _orderBy[0];
     NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
     // GSEA only enabled for RNAseq databases
     if ([db rangeOfString:@"RNAseq"].location == NSNotFound) {
@@ -224,56 +334,43 @@
     // Dispose of any resources that can be recreated.
 }
 // gather data on preferences and then send user to the advanced search page
-- (IBAction)advancedSearch:(id)sender {
-    // get the database ID and give it to ASC
-    NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
-    NSString *dbTag = @"";
-    dbTag = _databaseIDs[db];
-    // find the storyboard that coressponds to the the current device
-    UIStoryboard *storyboard = [[UIStoryboard alloc]init];
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
-    } else {
-        storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
-    }
-    // find the right view within the storyboard
-    AdvancedSearchController *ViewController = (AdvancedSearchController *)[storyboard instantiateViewControllerWithIdentifier:@"adsearch"];
-    ViewController.db = dbTag;
-    // these lines just gather data and pass it to ASC
-    if([_heatmapSwitch isOn]){
-        ViewController.produceHeatmap = @"&heatmap=on";
-    } else {
-        ViewController.produceHeatmap = @"";
-    }
-    NSMutableString *annotations = [@"" mutableCopy];
-    if([_transcriptSwitch isOn]) {
-        [annotations appendString:@"&annot=Transcript"];
-    } if([_transcriptLocationSwitch isOn]) {
-        [annotations appendString:@"&annot=Transcript+Location"];
-    } if([_entrezGeneIdSwitch isOn]) {
-        [annotations appendString:@"&annot=Entrez+Gene+ID"];
-    } if([_geneSymbolSwitch isOn]) {
-        [annotations appendString:@"&annot=Gene+Symbol"];
-    } if([_geneTitleSwitch isOn]) {
-        [annotations appendString:@"&annot=Gene+Title"];
-    } if([_membraneProteinSwitch isOn]) {
-        [annotations appendString:@"&annot=Membrane+Protein"];
-    }
-    ViewController.limitTo = [self pickerView:_limitPicker titleForRow:[_limitPicker selectedRowInComponent:0] forComponent:0];
-    ViewController.heatmapValue = [self pickerView:_heatmapValuePicker titleForRow:[_heatmapValuePicker selectedRowInComponent:0] forComponent:0];
-    ViewController.orderBy = [self pickerView:_orderByPicker titleForRow:[_orderByPicker selectedRowInComponent:0] forComponent:0];
-    ViewController.heatmapThreshold = _heatmapThreshold.text;
-    ViewController.annotations = annotations;
-    // switch view to ASC
-    [self presentViewController:ViewController animated:YES completion:nil];
-    [self.activityWheel stopAnimating];
-    
-}
+//- (IBAction)advancedSearch:(id)sender {
+//    // get the database ID and give it to ASC
+//    NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
+//    NSString *dbTag = @"";
+//    dbTag = _databaseIDs[db];
+//    // find the storyboard that coressponds to the the current device
+//    UIStoryboard *storyboard = [[UIStoryboard alloc]init];
+//    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+//        storyboard = [UIStoryboard storyboardWithName:@"Main_iPad" bundle:nil];
+//    } else {
+//        storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
+//    }
+//    // find the right view within the storyboard
+//    AdvancedSearchController *ViewController = (AdvancedSearchController *)[storyboard instantiateViewControllerWithIdentifier:@"adsearch"];
+//    ViewController.db = dbTag;
+//    // these lines just gather data and pass it to ASC
+//    if([_heatmapSwitch isOn]){
+//        ViewController.produceHeatmap = @"&heatmap=on";
+//    } else {
+//        ViewController.produceHeatmap = @"";
+//    }
+//    NSMutableString *annotations = [@"" mutableCopy];
+//    ViewController.limitTo = [self pickerView:_limitPicker titleForRow:[_limitPicker selectedRowInComponent:0] forComponent:0];
+//    ViewController.heatmapValue = [self pickerView:_heatmapValuePicker titleForRow:[_heatmapValuePicker selectedRowInComponent:0] forComponent:0];
+//    ViewController.orderBy = [self pickerView:_orderByPicker titleForRow:[_orderByPicker selectedRowInComponent:0] forComponent:0];
+//    ViewController.heatmapThreshold = _heatmapThreshold.text;
+//    ViewController.annotations = annotations;
+//    // switch view to ASC
+//    [self presentViewController:ViewController animated:YES completion:nil];
+//    [self.activityWheel stopAnimating];
+//    
+//}
 // The main seach function of the app. It searches based on the full-text area primarily.
 - (IBAction)search:(UIButton*)sender {
     [self.activityWheel startAnimating];
     // create a HTTP request
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK"]];
     // define HTTP method
     request.HTTPMethod = @"POST";
     int chromNum = [chromSelect.text intValue];
@@ -289,10 +386,12 @@
         chromEnd = @"null";
     }
     if([searchType isEqual:@"Search"]) {
-        searchType = @"submitted_text_query";
+        searchType = @"submitted_text_query=Search";
     } else if ([searchType isEqual:@"Location Search"]) {
-        searchType = @"submitted_location_query";
-    }
+        searchType = @"submitted_location_query=Search";
+    } else if ([searchType isEqual:@"Advanced Search"]) {
+		searchType = @"goto_multi_expression_query=Advanced+Expression+Search";
+	}
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
     NSString *name = _textArea.text;
     if([name rangeOfString:@"%"].location != NSNotFound) {
@@ -310,38 +409,20 @@
     NSString *heatmapThreshold = _heatmapThreshold.text;
     NSString *dbTag = @"";
     // convert heatmapValue from readable value to actual value that the server expects
-    if([heatmapValue isEqual:@"Log2 Intensities"]) {
-        heatmapValue = @"log2";
-    } if([heatmapValue isEqual:@"Median-Centered"]) {
-        heatmapValue = @"log2c";
-    } if ([heatmapValue isEqual:@"Z-Score"]) {
-        heatmapValue = @"log2cs";
-    } if ([heatmapValue isEqual:@"Median-Centered on Normal Samples"]) {
-        heatmapValue = @"log2cN";
-    } if ([heatmapValue isEqual:@"Z-Score on Normal Samples"]) {
-        heatmapValue = @"log2csN";
-    }
+	heatmapValue = _genesets[heatmapValue];
     // POST method requires all spaces to be replaced with +'s
     orderBy = [orderBy stringByReplacingOccurrencesOfString:@" " withString:@"+"];
     dbTag = _databaseIDs[db];
     if([_heatmapSwitch isOn]){
         produceHeatmap = @"heatmap=on";
     }
-    if([_transcriptSwitch isOn]) {
-        [annotations appendString:@"&annot=Transcript"];
-    } if([_transcriptLocationSwitch isOn]) {
-        [annotations appendString:@"&annot=Transcript+Location"];
-    } if([_entrezGeneIdSwitch isOn]) {
-        [annotations appendString:@"&annot=Entrez+Gene+ID"];
-    } if([_geneSymbolSwitch isOn]) {
-        [annotations appendString:@"&annot=Gene+Symbol"];
-    } if([_geneTitleSwitch isOn]) {
-        [annotations appendString:@"&annot=Gene+Title"];
-    } if([_membraneProteinSwitch isOn]) {
-        [annotations appendString:@"&annot=Membrane+Protein"];
+    for (UISwitch *aswitch in _switches) {
+        if ([aswitch isOn]) {
+            [annotations appendString: [NSString stringWithFormat:@"&annot=%@", [aswitch.accessibilityLabel stringByReplacingOccurrencesOfString:@" " withString:@"+"]]];
+        }
     }
     // Convert data and set request's HTTPBody property
-    NSString *stringData = [NSString stringWithFormat:@"rm=query_all&frm=query_all&submitted_multi_expression_query=TRUE&db=%@&name=%@&selectval_text=%@&%@=Search&chrom=%d&chromstart=%@&chromend=%@&%@&limit=%@%@&threshold=%@&exprs=%@&orderby=%@", dbTag, name, selectval_text, searchType, chromNum, chromStart, chromEnd, produceHeatmap, limitTo, annotations, heatmapThreshold, heatmapValue, orderBy];
+    NSString *stringData = [NSString stringWithFormat:@"rm=query_all&frm=query_all&submitted_multi_expression_query=TRUE&db=%@&name=%@&selectval_text=%@&%@&chrom=%d&chromstart=%@&chromend=%@&%@&tissue=XX&gtlt=>&fold=8&limit=%@%@&threshold=%@&exprs=%@&orderby=%@", dbTag, name, selectval_text, searchType, chromNum, chromStart, chromEnd, produceHeatmap, limitTo, annotations, heatmapThreshold, heatmapValue, orderBy];
     NSData *requestBodyData = [stringData dataUsingEncoding:NSUTF8StringEncoding];
     request.HTTPBody = requestBodyData;
     
@@ -366,8 +447,8 @@
     NSURL *URL = [NSURL URLWithString:URLString];
     NSError *error;
     NSString *htmlPage = [NSString stringWithContentsOfURL:URL
-                                                    encoding:NSASCIIStringEncoding
-                                                       error:&error];
+                                                  encoding:NSASCIIStringEncoding
+                                                     error:&error];
     // Find the right storyboard based on the device being used
     UIStoryboard *storyboard = [[UIStoryboard alloc]init];
     if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -399,6 +480,144 @@
         } else {
             _GSEA.hidden = false;
         }
+		for (UIView *object in _activeObjects) {
+			object.hidden = true;
+		}
+		[_activeObjects removeAllObjects];
+		// Here we're going to chop up the html response to find all the databases we have access to
+		NSString *temp = [[NSMutableString alloc]init];
+		NSArray* splittedArray= [_databaseHtml componentsSeparatedByString:@"<td align=center><a href='"];
+		NSMutableArray* loopArray = [splittedArray mutableCopy];
+		[loopArray removeObjectAtIndex:0];
+		NSArray* splittedStr = [[NSArray alloc]init];
+		NSArray* splittedStrv2 = [[NSArray alloc]init];
+		NSArray* splittedStrv3 = [[NSArray alloc]init];
+		_databaseIDs = [[NSMutableDictionary alloc]init];
+		self.databases = [[NSMutableArray alloc]init];
+		// for each db_help, there has to be a db. So loopArray should hold all the db's in it
+		for (NSString *str in loopArray) {
+			// We don't want any of the html to show up for the user, so right here it's being cut out
+			splittedStr = [str componentsSeparatedByString:@">"];
+			temp = [splittedStr[1] substringToIndex:[splittedStr[1] length]-3];
+			
+			if([temp length] != 1) {
+				[_databases addObject:(temp)];
+			}
+			splittedStrv2 = [str componentsSeparatedByString:@"db="];
+			splittedStrv3 = [splittedStrv2[1] componentsSeparatedByString:@";"];
+			NSString *key = [splittedStrv3 objectAtIndex:0];
+			_databaseIDs[temp] = key;
+		}
+		NSError *error;
+		NSString *htmlPage = [NSString stringWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=cdna", _databaseIDs[db]]] encoding:NSASCIIStringEncoding error:&error];
+		// The following set of code disects the <select> objects and extracts every option. The first one puts all the samples in _samples.
+		// This one takes all the genesets and puts them in _genesets
+		NSArray *sampleFinder = [htmlPage componentsSeparatedByString:@"<select name=\"exprs\""];
+		NSArray *sampleFinder2 = [sampleFinder[1] componentsSeparatedByString:@"</select>"];
+		NSMutableArray *sampleFinder3 = [[sampleFinder2[0] componentsSeparatedByString:@"<option"] mutableCopy];
+		[sampleFinder3 removeObjectAtIndex:0];
+		_genesets = [[NSMutableDictionary alloc]init];
+		_heatmapValues = [[NSMutableArray alloc]init];
+		NSArray *sampleFinder4 = [[NSArray alloc]init];
+		NSString *key = [[NSString alloc]init];
+		NSString *url = [[NSString alloc]init];
+		// each geneset has both a display name and an address for where the file is, so each display name (the key)
+		// has to be mapped to the address (the url, or object)
+		for (NSString *object in sampleFinder3) {
+			sampleFinder4 = [object componentsSeparatedByString:@">"];
+			if([sampleFinder4 count] == 3) {
+				key = sampleFinder4[1];
+				key = [key stringByReplacingOccurrencesOfString:@"   " withString:@" "];
+				key = [key stringByReplacingOccurrencesOfString:@"</option" withString:@""];
+				sampleFinder4 = [sampleFinder4[0] componentsSeparatedByString:@"value=\""];
+				url = sampleFinder4[1];
+				url = [url stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+				url = [url stringByReplacingOccurrencesOfString:@"=" withString:@""];
+				[_genesets setObject:url forKey:key];
+				[_heatmapValues addObject:key];
+			}
+		}
+		_switches = [[NSMutableArray alloc]init];
+		_realKeys = [[NSMutableDictionary alloc]init];
+		_orderBy = [[NSMutableArray alloc]init];
+		// Getting all the preset checkboxes is a little more complicated, so here a lot of manipulation has to be done.
+		// This isn't going to make a lot of sense unless you go and look at the html that's being recieved from the server.
+		// when you see it, it will make sense why each of these manipulations are being done.
+		// componentsSeparatedByString is the exact same as javascript .split("foobar");
+		NSMutableArray *msampleFinder = [[htmlPage componentsSeparatedByString:@"<input type=\"checkbox\" name=\"annot\" value=\""] mutableCopy];
+		[msampleFinder removeObjectAtIndex:0];
+		// Put a break point here and just look at the contents of each msampleFinder and it'll make sense.
+		// The last object is just going to be a bunch of gunk html that gives us the rest of the page data, but we don't care about that
+		// because we only wanted the check boxes
+		// The following code generates the switches, the labels describing them, and the data each one will provide if turned on.
+		// These are counters, c is what row the next switch should be generated on, and s is the catagory the next switch should be placed under.
+		int c = 0;
+		NSArray *dummyArray = [[NSArray alloc]init];
+		// we need to figure out how many switches we're going to use for each catagory so we can devide them evenly between the
+		// two columns on the iPad. The way I decided to do that was to just count up all of the elements of msampleFinder_ that
+		// will eventually be turned into switches and labels. Note that int objects cannot be put into NSMutableArrays because
+		// arrays can only hold pointers, and int is a native object without a pointer, so I recast it as an NSNumber.
+		NSNumber *numberOfSwitchesNeeded = [[NSNumber alloc]initWithInt:[msampleFinder count]];
+		// count is our overall number of switches + 1. The +1 is so that when necessary the next element in the array can be accessed
+		// before it is iterated on
+		int count = 1;
+		// row should really be column, this will only ever be 0 (left) or 1 (right)
+		int row = 0;
+		// We start with the 0.___ samples that we earlier put in msampleFinder2
+		for (NSString *str in msampleFinder) {
+			dummyArray = [str componentsSeparatedByString:@"\""];        // We don't need the beginning of our array anymore because we already captured it, so we're going to throw it away
+			// Since the iPad is so much bigger, we're obviously going to put the switches in different positions, so right here
+			// before we do that we check to see if the device is an iPad or not
+			if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+				// Since the iPad is big enough to fit two columns, we are going to use two columns! To figure out when we need to start
+				// our new column we check to see if the number of rows in that column (c) exceeds half the number of switches in total.
+				if (c > [numberOfSwitchesNeeded floatValue]/2.0 - 0.5) {
+					row = 1;
+					c= 0;
+				}
+				// Making the label that goes next to the switch. The parameters are (xpos, ypos, width, height)
+				UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(54+50 +355*row, 635 +c*34, 280, 21)];
+				myLabel.text = dummyArray[0];
+				myLabel.font = [UIFont systemFontOfSize:22];
+				// Place the label in the view that is on top. Otherwise it will be invisible
+				[self.container addSubview:myLabel];
+				UISwitch *mySwitch = [[UISwitch alloc] initWithFrame:CGRectMake(50+355*row, 630 + c*34, 0, 0)];
+				[mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
+				// give the switch a label corresponding to it's id
+				mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%@", dummyArray[0]];
+				if ([str rangeOfString:@"checked"].location != NSNotFound) {
+					[mySwitch setOn:YES];
+				}
+				[_orderBy addObject:dummyArray[0]];
+				[self.container addSubview:mySwitch];
+				[self.container addSubview:myLabel];
+				[_activeObjects addObject:mySwitch];
+				[_activeObjects addObject:myLabel];
+			} else {
+				// exact same thing, just different positioning to accomodate the iPhone's screen
+				UILabel *myLabel = [[UILabel alloc]initWithFrame:CGRectMake(71, 422+c*34, 280, 21)];
+				myLabel.text = dummyArray[0];
+				myLabel.font = [UIFont systemFontOfSize:14];
+				[self.container addSubview:myLabel];
+				UISwitch *mySwitch = [[UISwitch alloc] initWithFrame:CGRectMake(17, 422 + c*34, 0, 0)];
+				[mySwitch addTarget:self action:@selector(changeSwitch:) forControlEvents:UIControlEventValueChanged];
+				mySwitch.accessibilityLabel = [NSString stringWithFormat:@"%@", dummyArray[0]];
+				if ([str rangeOfString:@"checked"].location != NSNotFound) {
+					[mySwitch setOn:YES];
+				}
+				[_orderBy addObject:dummyArray[0]];
+				[self.container addSubview:mySwitch];
+				[self.container addSubview:myLabel];
+				[_activeObjects addObject:mySwitch];
+				[_activeObjects addObject:myLabel];
+			}
+			c++;
+			count++;
+		}
+		heatmapValueSelect.text = _heatmapValues[0];
+		[_heatmapValuePicker reloadAllComponents];
+		orderBySelect.text = _orderBy[0];
+		[_orderByPicker reloadAllComponents];
     }
     else if (pickerView == self.valuePicker) {
         [valueSelect setText:[self pickerView:_valuePicker titleForRow:[_valuePicker selectedRowInComponent:0] forComponent:0]];
@@ -542,6 +761,37 @@ numberOfRowsInComponent:(NSInteger)component
     } else {
         storyboard = [UIStoryboard storyboardWithName:@"Main_iPhone" bundle:nil];
     }
+	if ([_response rangeOfString:@"fold10"].location != NSNotFound) {
+		// get the database ID and give it to ASC
+		NSString *db = [self pickerView:_databasePicker titleForRow:[_databasePicker selectedRowInComponent:0] forComponent:0];
+		NSString *dbTag = @"";
+		dbTag = _databaseIDs[db];
+		// find the right view within the storyboard
+		AdvancedSearchController *ViewController = (AdvancedSearchController *)[storyboard instantiateViewControllerWithIdentifier:@"adsearch"];
+		ViewController.db = dbTag;
+		// these lines just gather data and pass it to ASC
+		if([_heatmapSwitch isOn]){
+			ViewController.produceHeatmap = @"&heatmap=on";
+		} else {
+			ViewController.produceHeatmap = @"";
+		}
+		NSMutableString *annotations = [@"" mutableCopy];
+		for (UISwitch *aswitch in _switches) {
+			if ([aswitch isOn]) {
+				[annotations appendString: [NSString stringWithFormat:@"&annot=%@", [aswitch.accessibilityLabel stringByReplacingOccurrencesOfString:@" " withString:@"+"]]];
+			}
+		}
+		ViewController.limitTo = [self pickerView:_limitPicker titleForRow:[_limitPicker selectedRowInComponent:0] forComponent:0];
+		ViewController.heatmapValue = _genesets[[self pickerView:_heatmapValuePicker titleForRow:[_heatmapValuePicker selectedRowInComponent:0] forComponent:0]];
+		ViewController.orderBy = [self pickerView:_orderByPicker titleForRow:[_orderByPicker selectedRowInComponent:0] forComponent:0];
+		ViewController.heatmapThreshold = _heatmapThreshold.text;
+		ViewController.annotations = annotations;
+		ViewController.html = _response;
+		// switch view to ASC
+		[self presentViewController:ViewController animated:YES completion:nil];
+		[self.activityWheel stopAnimating];
+		return;
+	}
     if ([_response rangeOfString:@"login_submitted"].location != NSNotFound) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Forced Logout" message:@"You have been inactive for too long and have been logged out. Please log in again."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
@@ -550,9 +800,9 @@ numberOfRowsInComponent:(NSInteger)component
         return;
     }
     if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
-        // All successful searches provide transcripts, so if this string is not there
-        // we know that it was unsuccessful and stop the program here.
-        if([_response rangeOfString:@"Transcripts(+)"].location == NSNotFound) {
+        // All successful searches provide gene details, and in order for there to be gene details
+        // there has to be a geneid
+        if([_response rangeOfString:@"geneid"].location == NSNotFound) {
             NSString *message = @"There were no results for the given search parameters. (Tip:If you don't find your gene of interest in the Full-Text query add two wildcards (%), e.g. \"%CD45%\") ";
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Emtpy Response" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];

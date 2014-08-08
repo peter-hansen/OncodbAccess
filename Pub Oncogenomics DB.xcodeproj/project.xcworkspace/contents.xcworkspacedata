@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Oncogenomics DB.xcodeproj">
+      location = "self:Pub Oncogenomics DB.xcodeproj">
    </FileRef>
 </Workspace>

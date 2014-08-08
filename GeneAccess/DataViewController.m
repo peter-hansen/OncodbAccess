@@ -27,6 +27,7 @@
 @property int backLocation;
 // history of pages gone to before pressing back multiple times.
 @property NSMutableArray *forwardHistory;
+@property BOOL warningMessageShown;
 @end
 
 @implementation DataViewController
@@ -46,6 +47,15 @@
 // Capture the contents of the webview so that the heatmap or whatever
 // is in the webview can be saved for future viewing
 - (IBAction)screenCapture:(id)sender {
+    // The methods used to capture the screen here perform best with retina devices. If they are not
+    // retina (i.e. scale == 1.0) we want to let the user know that they are operating suboptimally.
+    // We only want to show it once though, so we check to see if it's been shown before as well.
+    if (([UIScreen mainScreen].scale == 1.0) && !_warningMessageShown) {
+        NSString *message = @"This functionality works best on retina devices. In order to obtain a clear screenshot, switch to a retina device.";
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Warning" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
+        [alert show];
+        _warningMessageShown = true;
+    }
     //get the current view
     CGRect originalFrame = _webView.frame;
     // create variable to manipulate the frame with
@@ -151,32 +161,25 @@
     //make the background transparent
     [_webView setBackgroundColor:[UIColor clearColor]];
     //Get just the data we want from the table
-    NSArray* splittedArray= [_html componentsSeparatedByString:@"<div class=heatmap>"];
+    NSArray* splittedArray= [_html componentsSeparatedByString:@"<table  class=\"heatmapouter\">"];
     // check to make sure the data we're looking for is there so the app doesn't crash
     NSMutableString *secondhtml = [[NSMutableString alloc]init];
-    if(splittedArray[1]){
+    if([splittedArray count] > 1){
         secondhtml = splittedArray[1];
     } else {
         return;
     }
     // Earlier, we cut at the begging of <div class=heatmap>, now we're cutting off the bottom
     // so everything in the heatmap div should end up in secondhtml
-    splittedArray= [secondhtml componentsSeparatedByString:@"<!-- footer wrapper -->"];
-    secondhtml = splittedArray[0];
-    NSMutableString *thirdhtml = [[NSMutableString alloc]init];
+    splittedArray= [secondhtml componentsSeparatedByString:@"<hr width="];
+    secondhtml = [@"<link href=\"http://pob.abcc.ncifcrf.gov/main.css\" rel=\"stylesheet\" type=\"text/css\"><table class=\"heatmapouter\">" mutableCopy];
+    [secondhtml appendString:splittedArray[0]];
+    //[secondhtml appendFormat:@"</table>"];
     // the html defines paths by the directory that it is currently it, but since we are spoofing
     // a browser and not actually one, this causes an error for us. We must insert the full
     // file path into the html
     if([secondhtml rangeOfString:@"/images/"].location != NSNotFound) {
-        splittedArray= [secondhtml componentsSeparatedByString:@"/images/"];
-        if([splittedArray count] > 2) {
-            thirdhtml = [splittedArray[0] mutableCopy];
-            [thirdhtml appendString:(@"http://nci-oncomics-1.nci.nih.gov/images/")];
-            [thirdhtml appendString:(splittedArray[1])];
-            [thirdhtml appendString:(@"http://nci-oncomics-1.nci.nih.gov/images/")];
-            [thirdhtml appendString:(splittedArray[2])];
-            secondhtml = thirdhtml;
-        }
+        secondhtml = [[secondhtml stringByReplacingOccurrencesOfString:@"/images/" withString:@"http://pob.abcc.ncifcrf.gov/images/"] mutableCopy];
     }
     _currentHTML = secondhtml;
     _backHistory = [[NSMutableArray alloc]init];
@@ -226,7 +229,7 @@
         }
         // If they leave the nci-oncomics site they could be going anywhere, so there's no point in trying to manipulate things so the following
         // is onle done if they aren't
-        if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://nci-oncomics-1.nci.nih.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<div class=heatmap>")].location != NSNotFound){
+        if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://pob.abcc.ncifcrf.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<div class=heatmap>")].location != NSNotFound){
             // This part is exactly what we did when we first loaded this view and we're just doing it again because the user loaded another page on the website that requires the same manipulation. Check the viewDidLoad documentation for more information.
             NSArray* splittedArray= [transcriptHTML componentsSeparatedByString:@"<div class=heatmap>"];
             NSMutableString *secondhtml = [[NSMutableString alloc]init];
@@ -239,15 +242,7 @@
             secondhtml = splittedArray[0];
             NSMutableString *thirdhtml = [[NSMutableString alloc]init];
             if([secondhtml rangeOfString:@"/images/"].location != NSNotFound) {
-                splittedArray= [secondhtml componentsSeparatedByString:@"/images/"];
-                if([splittedArray count] > 2) {
-                    thirdhtml = [splittedArray[0] mutableCopy];
-                    [thirdhtml appendString:(@"http://nci-oncomics-1.nci.nih.gov/images/")];
-                    [thirdhtml appendString:(splittedArray[1])];
-                    [thirdhtml appendString:(@"http://nci-oncomics-1.nci.nih.gov/images/")];
-                    [thirdhtml appendString:(splittedArray[2])];
-                    secondhtml = thirdhtml;
-                }
+                secondhtml = [[secondhtml stringByReplacingOccurrencesOfString:@"/images/" withString:@"http://pob.abcc.ncifcrf.gov/images/"] mutableCopy];
             }
             if([transcriptHTML rangeOfString:(@"/help/")].location != NSNotFound){
                 NSMutableString *fourthhtml = [[NSMutableString alloc]init];
@@ -256,7 +251,7 @@
                 fourthhtml = [splittedArray[0] mutableCopy];
                 [mutArray removeObjectAtIndex:0];
                 for (NSString *key in mutArray) {
-                    [fourthhtml appendString:(@"http://nci-oncomics-1.nci.nih.gov/help/")];
+                    [fourthhtml appendString:(@"http://pob.abcc.ncifcrf.gov/help/")];
                     [fourthhtml appendString:(key)];
                 }
                 _backHTML = _currentHTML;
@@ -273,39 +268,20 @@
             [webView loadHTMLString:[thirdhtml description] baseURL:nil];
             return YES;
         }
-        else if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://nci-oncomics-1.nci.nih.gov/")].location != NSNotFound && [transcriptHTML rangeOfString:(@"<table class=\"detailpage\">")].location != NSNotFound) {
-            NSArray* splittedArray= [transcriptHTML componentsSeparatedByString:@"<table class=\"detailpage\">"];
-            NSMutableString *secondhtml = [[NSMutableString alloc]init];
-            if(splittedArray[1]){
-                secondhtml = splittedArray[1];
-            } else {
-                return NO;
-            }
-            splittedArray= [secondhtml componentsSeparatedByString:@"<!-- footer wrapper -->"];
-            secondhtml = splittedArray[0];
-            NSMutableString *tableClass = [@"<div><table class=detailpage>" mutableCopy];
-            [tableClass appendString:secondhtml];
-            secondhtml = tableClass;
-            NSMutableString *thirdhtml = [[NSMutableString alloc]init];
-            thirdhtml = secondhtml;
-            if([secondhtml rangeOfString:@"<img src=\""].location != NSNotFound) {
-                splittedArray= [secondhtml componentsSeparatedByString:@"<img src=\""];
-                thirdhtml = [splittedArray[0] mutableCopy];
-                [thirdhtml appendString:@"<img src=\"http://nci-oncomics-1.nci.nih.gov/cgi-bin/"];
-                [thirdhtml appendString:splittedArray[1]];
-            }
-            _backHTML = _currentHTML;
-            _backLocation++;
-            [_backHistory addObject:_currentHTML];
-            _currentHTML = thirdhtml;
-            [webView loadHTMLString:[thirdhtml description] baseURL:nil];
-            return YES;
+        else if (navigationType == UIWebViewNavigationTypeLinkClicked && [urlPath rangeOfString:(@"http://pob.abcc.ncifcrf.gov/")].location != NSNotFound) {
+                    _backHTML = _currentHTML;
+                    _backLocation++;
+                    [_backHistory addObject:_currentHTML];
+                    _currentHTML = transcriptHTML;
+                    return YES;
         }
-        _backHTML = _currentHTML;
-        _backLocation++;
-        [_backHistory addObject:_currentHTML];
-        _currentHTML = transcriptHTML;
-        return YES;
+        [[UIApplication sharedApplication] openURL: url];
+        return NO;
+//        _backHTML = _currentHTML;
+//        _backLocation++;
+//        [_backHistory addObject:_currentHTML];
+//        _currentHTML = transcriptHTML;
+//        return YES;
     }
     return YES;
 }

@@ -21,7 +21,7 @@
 @property (strong, nonatomic) UIPickerView *andorPicker;
 @property (strong, nonatomic) NSArray *andorArray;
 @property (strong, nonatomic) NSArray *gtlts;
-@property (strong, nonatomic) NSArray *optionsTissue;
+@property (strong, nonatomic) NSMutableArray *optionsTissue;
 @property (strong, nonatomic) IBOutlet UITextField *tissue0;
 @property (strong, nonatomic) UIPickerView *tissue0Picker;
 @property (strong, nonatomic) IBOutlet UITextField *gtlt0;
@@ -84,6 +84,9 @@
 // Data in readable string format
 @property (strong, nonatomic) NSString *response;
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+// This is the array of textfields that we will limit the length of
+// It is defined in viewDidLoad
+@property (strong, nonatomic) NSArray *folds;
 @end
 
 @implementation AdvancedSearchController
@@ -134,14 +137,29 @@
 // characters will need to be changed in order to get it working well.
 - (IBAction)Search:(id)sender {
     [self.activityWheel startAnimating];
+    NSMutableArray *inputs = [[NSMutableArray alloc]initWithArray:@[_tissue0.text, _gtlt0.text, _fold0.text, _tissue1.text, _gtlt1.text, _fold1.text, _tissue2.text, _gtlt2.text, _fold2.text, _tissue3.text, _gtlt3.text, _fold3.text, _tissue4.text, _gtlt4.text, _fold4.text, _tissue5.text, _gtlt5.text, _fold5.text, _tissue6.text, _gtlt6.text, _fold6.text, _tissue7.text, _gtlt7.text, _fold7.text,_tissue8.text, _gtlt8.text, _fold8.text, _tissue9.text, _gtlt9.text, _fold9.text, _tissue10.text, _gtlt10.text, _fold10.text]];
+    int c = 0;
+    NSMutableArray *tempArray = [[NSMutableArray alloc]init];
+    for (NSString *str in inputs) {
+        if ([str isEqualToString:@""]) {
+            [tempArray addObject:@"NULL"];
+        } else {
+            [tempArray addObject:str];
+        }
+        c++;
+    }
     // set URL to send request to
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock"]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK"]];
     // set method to send HTTP request by
     request.HTTPMethod = @"POST";
     // set encoding
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
     // Variadic function to instert all our user information into the POST message
-    NSString *stringData = [NSString stringWithFormat:@"rm=multi_expression_query&frm=multi_expression_query&submitted_multi_expression_query=SEARCH&db=nb&tissue0=%@&gtlt0=%@&fold0=%@tissue1=%@&gtlt1=%@&fold1=%@tissue2=%@&gtlt2=%@&fold2=%@tissue3=%@&gtlt3=%@&fold3=%@tissue4=%@&gtlt4=%@&fold4=%@tissue5=%@&gtlt5=%@&fold5=%@tissue6=%@&gtlt6=%@&fold6=%@tissue7=%@&gtlt7=%@&fold7=%@tissue8=%@&gtlt8=%@&fold8=%@tissue9=%@&gtlt9=%@&fold9=%@tissue10=%@&gtlt10=%@&fold10=%@%@@&limit=%@%@&threshold=%@&exprs=%@&orderby=%@", _tissue0.text, _gtlt0.text, _fold0.text, _tissue1.text, _gtlt1.text, _fold1.text, _tissue2.text, _gtlt2.text, _fold2.text, _tissue3.text, _gtlt3.text, _fold3.text, _tissue4.text, _gtlt4.text, _fold4.text, _tissue5.text, _gtlt5.text, _fold5.text, _tissue6.text, _gtlt6.text, _fold6.text, _tissue7.text, _gtlt7.text, _fold7.text,_tissue8.text, _gtlt8.text, _fold8.text, _tissue9.text, _gtlt9.text, _fold9.text, _tissue10.text, _gtlt10.text, _fold10.text, _produceHeatmap, _limitTo, _annotations, _heatmapThreshold, _heatmapValue, _orderBy];
+    _annotations = [_annotations stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+    _heatmapThreshold = [_heatmapThreshold stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+    _heatmapValue = [_heatmapValue stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+    _orderBy = [_orderBy stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+    NSString *stringData = [NSString stringWithFormat:@"rm=multi_expression_query&frm=multi_expression_query&submitted_multi_expression_query=Search&db=nb&tissue0=%@&gtlt0=%@&fold0=%@&tissue1=%@&gtlt1=%@&fold1=%@&tissue2=%@&gtlt2=%@&fold2=%@&tissue3=%@&gtlt3=%@&fold3=%@&tissue4=%@&gtlt4=%@&fold4=%@&tissue5=%@&gtlt5=%@&fold5=%@&tissue6=%@&gtlt6=%@&fold6=%@&tissue7=%@&gtlt7=%@&fold7=%@&tissue8=%@&gtlt8=%@&fold8=%@&tissue9=%@&gtlt9=%@&fold9=%@&tissue10=%@&gtlt10=%@&fold10=%@%@&limit=%@%@&threshold=%@&exprs=%@&orderby=%@&heatmap=on&andor1=%@", tempArray[0], tempArray[1], tempArray[2], tempArray[3], tempArray[4], tempArray[5], tempArray[6], tempArray[7], tempArray[8], tempArray[9], tempArray[10], tempArray[11], tempArray[12], tempArray[13], tempArray[14], tempArray[15], tempArray[16], tempArray[17], tempArray[18], tempArray[19], tempArray[20], tempArray[21], tempArray[22], tempArray[23], tempArray[24], tempArray[25], tempArray[26], tempArray[27], tempArray[28], tempArray[29], tempArray[30], tempArray[31], tempArray[32], _produceHeatmap, _limitTo, _annotations, _heatmapThreshold, _heatmapValue, _orderBy, _andor.text];
     NSData *requestBodyData = [stringData dataUsingEncoding:NSUTF8StringEncoding];
     request.HTTPBody = requestBodyData;
     
@@ -151,9 +169,34 @@
     (void)[[NSURLConnection alloc] initWithRequest:request delegate:self];
 
 }
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if ([_folds containsObject:textField]) {
+        NSUInteger newLength = [textField.text length] + [string length] - range.length;
+        return (newLength > 4) ? NO : YES;
+    }
+    return YES;
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    // This one takes all the genesets and puts them in _genesets
+    // load the page from the server and get what we don't have already
+    NSMutableArray *sampleFinder = [[_html componentsSeparatedByString:@"<select name=\"tissue0\""] mutableCopy];
+    NSMutableArray *sampleFinder2 = [[sampleFinder[1] componentsSeparatedByString:@"</select>"] mutableCopy];
+    NSMutableArray *sampleFinder3 = [[sampleFinder2[0] componentsSeparatedByString:@"<option value"] mutableCopy];
+    [sampleFinder3 removeObjectAtIndex:0];
+    _optionsTissue = [[NSMutableArray alloc]init];
+    NSArray *sampleFinder4 = [[NSArray alloc]init];
+    NSString *key = [[NSString alloc]init];
+    // each geneset has both a display name and an address for where the file is, so each display name (the key)
+    // has to be mapped to the address (the url, or object)
+    for (NSString *object in sampleFinder3) {
+        sampleFinder4 = [object componentsSeparatedByString:@">"];
+        key = sampleFinder4[1];
+        key = [key stringByReplacingOccurrencesOfString:@"   " withString:@" "];
+        key = [key stringByReplacingOccurrencesOfString:@"</option" withString:@""];
+        [_optionsTissue addObject:key];
+    }
     // Set all delegates so that we can catch events on these objects. I specifically added these so that
     // the textFieldShouldBeginEditing function can be triggered by textfields and the touchesBegan method
     // can be triggered by the scrollView
@@ -190,11 +233,12 @@
     [_fold8 setDelegate:self];
     [_fold9 setDelegate:self];
     [_fold10 setDelegate:self];
+    // This array defines which textfields will have restricted lengths
+    _folds = @[_fold0, _fold1, _fold2, _fold3, _fold4, _fold5, _fold6, _fold7, _fold8, _fold9,_fold10];
     // These statements initialize all our pickerviews so that when we tap on
     // a textfield they pop up instead of a keyboard. These arrays define what
     // shows up in the picker views
     _gtlts = [[NSArray alloc]initWithObjects:@">", @"<", nil];
-    _optionsTissue = [[NSArray alloc]initWithObjects:@"", @"every_Stage", @"ASPS", @"Normal", nil];
     _andorArray = [[NSArray alloc]initWithObjects:@"AND", @"OR", nil];
     // Allocate and itialize the memory to hold the picker
     _andorPicker = [[UIPickerView alloc]init];
@@ -454,7 +498,7 @@ numberOfRowsInComponent:(NSInteger)component
         return 2;
     }
     else{
-        return 4;
+        return [_optionsTissue count];
     }
 }
 // This method defines the title of the row. This is what is behind the scenes. It is what the pickerview is
@@ -514,6 +558,7 @@ numberOfRowsInComponent:(NSInteger)component
     if ([_response rangeOfString:@"500 Internal Server Error"].location != NSNotFound) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"500 Internal Server Error" message:@"The server encountered an internal error or                              misconfiguration and was unable to complete                              your request."   delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
         [alert show];
+        [_activityWheel stopAnimating];
         return;
     }
     // find the appropriate storyboard for the given device
@@ -533,7 +578,7 @@ numberOfRowsInComponent:(NSInteger)component
     if([_response rangeOfString:@"<table  class=\"heatmapouter\">"].location != NSNotFound) {
         // All successful searches provide transcripts, so if this string is not there
         // we know that it was unsuccessful and stop the program here.
-        if([_response rangeOfString:@"Transcripts(+)"].location == NSNotFound) {
+        if([_response rangeOfString:@"geneid"].location == NSNotFound) {
             NSString *message = @"There were no results for the given search parameters. (Tip:If you don't find your gene of interest in the Full-Text query add two wildcards (%), e.g. \"%CD45%\") ";
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Emtpy Response" message:message delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil];
             [alert show];

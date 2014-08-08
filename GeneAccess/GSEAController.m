@@ -72,7 +72,7 @@
 // cMAP
 @property (strong, nonatomic) NSMutableArray *cMAP;
 // How far the page needs to be able to scroll
-@property (nonatomic) int scrollDist;
+@property (nonatomic) NSUInteger scrollDist;
 // Are the active objects pos/neg?
 @property (nonatomic) BOOL posNeg;
 // This label shows what datasets are currently displayed
@@ -290,7 +290,7 @@
         // make it look nice
         if (_posNeg) {
             if ([_activeObjects count] > 152) {
-                int extra = [_activeObjects count]-160;
+                NSUInteger extra = [_activeObjects count]-160;
                 _scrollDist = 15 + 34*extra/4;
             } else {
                 _scrollDist = 0;
@@ -298,7 +298,7 @@
         } else {
             // If _posNeg is false then we only need 19*2*2 elements, which is what we have here.
             if ([_activeObjects count] > 76) {
-                int extra = [_activeObjects count]-80;
+                NSUInteger extra = [_activeObjects count]-80;
                 _scrollDist = 15 + 34*extra/2;
             }
         }
@@ -307,14 +307,14 @@
         // the screen (1*4*4)
         if (_posNeg) {
             if ([_activeObjects count] > 16) {
-                int extra = [_activeObjects count]-20;
+                NSUInteger extra = [_activeObjects count]-20;
                 _scrollDist = 15 + 34*extra/4;
             } else {
                 _scrollDist = 0;
             }
         } else {
             if ([_activeObjects count] > 8) {
-                int extra = [_activeObjects count]-10;
+                NSUInteger extra = [_activeObjects count]-10;
                 _scrollDist = 15 + 34*extra/2;
             }
         }
@@ -352,7 +352,7 @@
         }
     }
     // Create a request object with all the data we want to send to the server. This is how variadic functions are defined in objective C
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://nci-oncomics-1.nci.nih.gov/cgi-bin/JK_mock?rm=query_all;db=%@;source=genomic", _db]]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://pob.abcc.ncifcrf.gov/cgi-bin/JK?rm=query_all;db=%@;source=genomic", _db]]];
     request.HTTPMethod = @"POST";
     NSString *stringData = [NSString stringWithFormat:@"rm=query_all&frm=query_all&submitted_multi_expression_query=TRUErm=show_gsea&show_gsea=Run+GSEA&prerank_file=null&gsea_file=null&db=%@&smplid=%ld&geneset=%@&geneduprm=%@&gmx=%@%@", _db, (long)[self.samplePicker selectedRowInComponent:0], chosenGenes, duplicateyn, chosenGeneset, grp];
     NSData *requestBodyData = [stringData dataUsingEncoding:NSUTF8StringEncoding];
@@ -487,17 +487,17 @@
     // will eventually be turned into switches and labels. Note that int objects cannot be put into NSMutableArrays because
     // arrays can only hold pointers, and int is a native object without a pointer, so I recast it as an NSNumber.
     NSMutableArray *countsArray = [[NSMutableArray alloc]init];
-    NSInteger numberOfSwitchesNeeded = 0;
+    NSUInteger numberOfSwitchesNeeded = 0;
     for (NSString *str in msampleFinder2) {
         if ([[str substringWithRange:NSRangeFromString(@"0,5")] isEqualToString:@"/WWW/"]) {
             numberOfSwitchesNeeded++;
         } else {
-            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            NSNumber *wrappedInt = [NSNumber numberWithUnsignedInteger:numberOfSwitchesNeeded];
             [countsArray addObject:wrappedInt];
             numberOfSwitchesNeeded = 0;
         }
         if ([str isEqual:[msampleFinder2 lastObject]]) {
-            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            NSNumber *wrappedInt = [NSNumber numberWithUnsignedInteger:numberOfSwitchesNeeded];
             [countsArray addObject:wrappedInt];
             numberOfSwitchesNeeded = 0;
         }
@@ -584,12 +584,12 @@
         if ([[str substringWithRange:NSRangeFromString(@"0,5")] isEqualToString:@"/WWW/"]) {
             numberOfSwitchesNeeded++;
         } else {
-            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            NSNumber *wrappedInt = [NSNumber numberWithUnsignedInteger:numberOfSwitchesNeeded];
             [countsArray addObject:wrappedInt];
             numberOfSwitchesNeeded = 0;
         }
         if ([str isEqual:[msampleFinder4 lastObject]]) {
-            NSNumber *wrappedInt = [NSNumber numberWithInt:numberOfSwitchesNeeded];
+            NSNumber *wrappedInt = [NSNumber numberWithUnsignedInteger:numberOfSwitchesNeeded];
             [countsArray addObject:wrappedInt];
             numberOfSwitchesNeeded = 0;
         }

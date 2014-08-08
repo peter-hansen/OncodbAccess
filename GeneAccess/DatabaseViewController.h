@@ -27,8 +27,10 @@
 // holds information about limit to results per page
 @property (strong, nonatomic) IBOutlet UITextField *limitSelect;
 // holds information about the value for the heatmaps
+@property (strong, nonatomic) IBOutlet UILabel *heatmapValueLabel;
 @property (strong, nonatomic) IBOutlet UITextField *heatmapValueSelect;
 // holds information on what things are ordered by
+@property (strong, nonatomic) IBOutlet UILabel *orderByLabel;
 @property (strong, nonatomic) IBOutlet UITextField *orderBySelect;
 // all of these are just the pickerview for each _____Select
 @property(strong, nonatomic) UIPickerView *databasePicker;
@@ -41,8 +43,8 @@
 @property(strong, nonatomic) NSArray *values;
 @property(strong, nonatomic) NSArray *chroms;
 @property(strong, nonatomic) NSArray *limits;
-@property(strong, nonatomic) NSArray *heatmapValues;
-@property(strong, nonatomic) NSArray *orderBy;
+@property(strong, nonatomic) NSMutableArray *heatmapValues;
+@property(strong, nonatomic) NSMutableArray *orderBy;
 @property(strong, nonatomic) NSString *response;
 // html response. It's called database because it's used
 // to determine which databases to provide access to.

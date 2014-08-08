@@ -17,4 +17,5 @@
 @property (strong,nonatomic) NSString *heatmapValue;
 @property (strong, nonatomic) NSString *orderBy;
 @property (strong, nonatomic) NSString *heatmapThreshold;
+@property (strong, nonatomic) NSString *html;
 @end

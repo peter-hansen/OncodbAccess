@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B37BCB05193E03E6004EC6D0"
-               BuildableName = "GeneAccess.app"
-               BlueprintName = "Oncogenomics DB"
-               ReferencedContainer = "container:Oncogenomics DB.xcodeproj">
+               BuildableName = "Pub Oncogenomics DB.app"
+               BlueprintName = "Pub Oncogenomics DB"
+               ReferencedContainer = "container:Pub Oncogenomics DB.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B37BCB29193E03E6004EC6D0"
-               BuildableName = "GeneAccessTests.xctest"
-               BlueprintName = "Oncogenomics DBTests"
-               ReferencedContainer = "container:Oncogenomics DB.xcodeproj">
+               BuildableName = "Pub Oncogenomics DBTests.xctest"
+               BlueprintName = "Pub Oncogenomics DBTests"
+               ReferencedContainer = "container:Pub Oncogenomics DB.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B37BCB05193E03E6004EC6D0"
-            BuildableName = "GeneAccess.app"
-            BlueprintName = "Oncogenomics DB"
-            ReferencedContainer = "container:Oncogenomics DB.xcodeproj">
+            BuildableName = "Pub Oncogenomics DB.app"
+            BlueprintName = "Pub Oncogenomics DB"
+            ReferencedContainer = "container:Pub Oncogenomics DB.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B37BCB05193E03E6004EC6D0"
-            BuildableName = "GeneAccess.app"
-            BlueprintName = "Oncogenomics DB"
-            ReferencedContainer = "container:Oncogenomics DB.xcodeproj">
+            BuildableName = "Pub Oncogenomics DB.app"
+            BlueprintName = "Pub Oncogenomics DB"
+            ReferencedContainer = "container:Pub Oncogenomics DB.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -80,9 +80,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B37BCB05193E03E6004EC6D0"
-            BuildableName = "GeneAccess.app"
-            BlueprintName = "Oncogenomics DB"
-            ReferencedContainer = "container:Oncogenomics DB.xcodeproj">
+            BuildableName = "Pub Oncogenomics DB.app"
+            BlueprintName = "Pub Oncogenomics DB"
+            ReferencedContainer = "container:Pub Oncogenomics DB.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
